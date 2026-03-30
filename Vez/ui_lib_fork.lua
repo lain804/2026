@@ -399,6 +399,7 @@ function lib:createBottomButton(name, callback)
 	toggle.Parent = parent
 
 	local label = toggle.TextLabel
+	label.Name = name
 	label.Text = name
 	toggle.Size = UDim2.new(0, label.TextBounds.X + 25, 1, -20)
 
