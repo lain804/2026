@@ -284,11 +284,12 @@ function lib:createLog(id, name, length, priority, callback)
 end
 
 function lib:clearLogs()
-	local table = getTabGroups()
-
-	for _, tab in table do
-		table.foreach(tab, print)
-		--tab:Destroy()
+	for _, Log in CoreGui.AnimLoggerUI.Background.contain.left.contain.ScrollingFrame:GetChildren() do
+		if Log.Name == "logUn" or Log.Name == "UIListLayout" then
+			continue
+		else
+			Log:Destroy()
+		end
 	end
 end
 
