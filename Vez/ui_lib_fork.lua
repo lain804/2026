@@ -411,10 +411,10 @@ function lib:updateBottomButton(button, name)
 	local label = AnimLoggerUI.Background.contain.bottom.contain[button]
 	label.Text = name
 	label.Name = name
-	label = AnimLoggerUI.Background.contain.bottom.contain[name][name]
-	label.Name = name
+	label = AnimLoggerUI.Background.contain.bottom.contain[name]
+	label[button].Name = name
 	
-	label.Parent.Size = UDim2.new(0, label.TextBounds.X + 25, 1, -20)
+	label[name].Size = UDim2.new(0, label[name].TextBounds.X + 25, 1, -20)
 end
 
 function lib:createButtomLine()
