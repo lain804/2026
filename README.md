@@ -1,2 +1,2 @@
 # 2026
-New &amp; updated scripts, old repository is for shitty old scripts
+New &amp; updated scripts, old repository is for shitty old scripts (now private)
