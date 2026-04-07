@@ -34,6 +34,9 @@ local Logger = {
     LogTargets = {"LocalPlayer", "AllPlayers", "Others"};
     LogTarget = "LocalPlayer";
 
+    NewThread = nil;
+    TemporaryAnim = nil;
+    TemporaryAnimTrack = nil;
     AnimationTracks = nil;
     SelectedAnim = nil;
     LogDelayButton = nil;
@@ -53,34 +56,40 @@ local Logger = {
 }
 
 function Logger:GetSelected()
-    local PropertiesFolder = nil
-    local PropertiesTable = {}
+    self.PropertiesFolder = nil
+    self.PropertiesTable = {}
 
     for _, Log in self.Logs:GetChildren() do
         if Log:FindFirstChild("log") and Log.log.BackgroundTransparency == 0 then
-            PropertiesFolder = self.LogProperties[Log.Name]
+            self.PropertiesFolder = self.LogProperties[Log.Name]
             break
         end
     end
 
+    if not self.PropertiesFolder then
+        task.wait()
+        
+        return
+    end
+
     local Success, Fail = pcall(function()
-        for _, Property in PropertiesFolder:GetChildren() do
+        for _, Property in self.PropertiesFolder:GetChildren() do
             if Property.Name == "propdif" and Property.Visible == true then
                 local SelectedProperty = self.Properties[Property.name.Text]
 
                 if SelectedProperty then
-                    PropertiesTable[SelectedProperty] = Property.value.Text
+                    self.PropertiesTable[SelectedProperty] = Property.value.Text
                     continue
                 end
             end
 
             if Property.Name == "contain" then
                 if Property.length then
-                    PropertiesTable.Length = Property.length.value.Text
+                    self.PropertiesTable.Length = Property.length.value.Text
                 end
                 
                 if Property.priority then
-                    PropertiesTable.Priority = Property.priority.value.Text
+                    self.PropertiesTable.Priority = Property.priority.value.Text
                 end
             end
         end
@@ -90,28 +99,31 @@ function Logger:GetSelected()
         warn(`[{Version}] Crimson had a stroke: {Fail} (This error is quite irrelevant most likely.)`)
     end
 
-    return PropertiesTable
+    return self.PropertiesTable
 end
 
 function Logger:PlayAnimation()
     self.Selected = self:GetSelected()
     if self.Selected == nil then return end
 
-    local Anim = Instance.new("Animation")
+    self.TemporaryAnim = Instance.new("Animation")
     print(`rbxassetid://{self.Selected.AnimationId}`)
-    Anim.AnimationId = `rbxassetid://{self.Selected.AnimationId}`
+    self.TemporaryAnim.AnimationId = `rbxassetid://{self.Selected.AnimationId}`
 
-    local AnimTrack = self.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Animator:LoadAnimation(Anim)
+    self.TemporaryAnimTrack = self.LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Animator:LoadAnimation(self.TemporaryAnim)
 
-    AnimTrack.Priority = Enum.AnimationPriority[self.Selected.Priority]
-    AnimTrack.Looped = self.Selected.Looped
-    AnimTrack:AdjustSpeed(self.Selected.Speed)
-    AnimTrack.TimePosition = self.Selected["Time Position"]
-    AnimTrack:Play()
+    self.TemporaryAnimTrack.Priority = Enum.AnimationPriority[self.Selected.Priority]
+    self.TemporaryAnimTrack.Looped = self.Selected.Looped
+    self.TemporaryAnimTrack:AdjustSpeed(self.Selected.Speed)
+    self.TemporaryAnimTrack.TimePosition = self.Selected["Time Position"]
+    self.TemporaryAnimTrack:Play()
 
     task.wait(self.Selected.Length)
-    AnimTrack:Stop()
-    Anim:Destroy()
+    self.TemporaryAnimTrack:Stop()
+    self.TemporaryAnim:Destroy()
+
+    self.TemporaryAnim = nil
+    self.TemporaryAnimTrack = nil
 end
 
 function Logger:ChangeLogDelay()
@@ -148,12 +160,13 @@ function Logger:ChangeLogTarget()
 end
 
 function Logger:LoopAndCreateTab()
-    if not self.Humanoid:FindFirstChild("Animator") then return end
+    if not self.Humanoid or not self.Humanoid:FindFirstChild("Animator") then return end
     self.AnimationTracks = self.Humanoid.Animator:GetPlayingAnimationTracks()
     
     for _, Animation in self.AnimationTracks do
         self.SelectedAnim = Animation.Animation
         if table.find(BlockedAnimations, self.SelectedAnim.Name) then continue end
+        if not self.Humanoid then return end
         
         local Log = Library:createLog(
             `rbxassetid://{self.SelectedAnim.AnimationId:match("%d+")}                    {self.SelectedAnim.Name}`,
@@ -279,16 +292,18 @@ Library:createAnimToggle("Loop Preview", function(State)
         Logger.Selected = Logger:GetSelected()
         if Logger.Selected == nil then continue end
 
+        Logger.NewThread = task.spawn(function()
+            if Logger.Selected ~= Logger:GetSelected() or Logger.AnimPreviewToggle == false then
+                Library.stopPreview()
+            end
+        end)
+
         local Success, Fail = pcall(function()
             Library.playPreview(`rbxassetid://{Logger.Selected.AnimationId}`)
         end)
 
         if not Success then
             warn(`[{Version}] Crimson had a stroke (2): {Fail} (This error is quite irrelevant most likely.)`)
-        end
-
-        if Logger.Selected ~= Logger:GetSelected() then
-            Library.stopPreview()
         end
 
         if Logger.DelayLoop == true then
