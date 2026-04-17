@@ -82,6 +82,7 @@ getgenv().ChosenTargetFolder = nil
 
 **Owner & Developer of Crimson**
 - @vezagain (1387876110246609127) on Discord
+- [vez's Discord Server](https://discord.com/invite/6e7mm8xbbb)
 - [v3rm.net Profile](https://v3rm.net/members/vez.976/)
 - [vez's Website](https://vezzy.cc/)
 
