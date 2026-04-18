@@ -1,6 +1,6 @@
 --// UI by moonroon - specifically made for this script.
 local Repo = "https://raw.githubusercontent.com/Vezise/ui-for-vez/main/"
-local Repo2 = "https://raw.githubusercontent.com/Vezise/2026/main/Vez/Crimson/"
+local Repo2 = "https://raw.githubusercontent.com/Vezise/2026/main/Vez/Crimson/" -- put into new folder
 
 local HttpService = game:GetService("HttpService")
 local function SendWebhook(Title, Message)
