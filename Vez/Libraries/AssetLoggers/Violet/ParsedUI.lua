@@ -729,7 +729,7 @@ local vpCamera = new("Camera", {
 viewport.CurrentCamera = vpCamera
 
 local worldModel = new("WorldModel", {
-    Parent = worldModel,
+    Parent = viewport,
     Name = "WorldModel"
 })
 
