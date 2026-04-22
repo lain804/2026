@@ -1,9 +1,12 @@
+-- SoundLoggerUI (by Vez) — generated from ui_lib_noti_13 (2).rbxmx
+-- Builds the ScreenGui hierarchy in Luau.
+
 local Assets = {
-  [1] = "108453875048733.png";
-  [2] = "82686076130111.png";
-  [3] = "95222964296464.png";
-  [4] = "114069756293603.png";
-  [5] = "136563593316996.png";
+  "108453875048733.png";
+  "82686076130111.png";
+  "95222964296464.png";
+  "114069756293603.png";
+  "136563593316996.png";
 }
 
 local URL = "https://github.com/Vezise/2026/tree/main/Vez/Libraries/AssetLoggers/Violet/Assets"
@@ -18,7 +21,7 @@ if not isfolder("Violet/Assets") then
 end
 
 for _, Asset in Assets do
-    if not isfile(Asset) then
+    if not isfile(`Violet/Assets/{Asset}`) then
         AssetData = game:HttpGet(`{URL}/{Asset}`)
         writefile(`Violet/Assets/{Asset}`, AssetData)
     end
@@ -78,11 +81,10 @@ new("UIAspectRatioConstraint", {
 	AspectRatio = 1.49889135,
 })
 
--- decorative background image
 new("ImageLabel", {
 	Name = "back",
 	Parent = Background,
-	Image = getcustomasset and getcustomasset("108453875048733.png") or "rbxassetid://108453875048733",
+	Image = getcustomasset and getcustomasset("Violet/Assets/108453875048733.png") or "rbxassetid://108453875048733",
 	BackgroundTransparency = 1,
 	Position = UDim2n(0, -24, 0, -24),
 	Size = UDim2n(0, 725, 0, 500),
@@ -92,11 +94,12 @@ new("ImageLabel", {
 local Top = new("ImageLabel", {
 	Name = "top",
 	Parent = Background,
-	Image = getcustomasset and getcustomasset("82686076130111.png") or "rbxassetid://82686076130111",
+	Image = getcustomasset and getcustomasset("Violet/Assets/82686076130111.png") or "rbxassetid://82686076130111",
 	BackgroundTransparency = 1,
 	Size = UDim2n(0, 676, 0, 30),
 })
 
+-- layout1 (left header: VIOLET - Sound Logger By Vez)
 local layout1 = new("Frame", {
 	Name = "layout1",
 	Parent = Top,
@@ -113,10 +116,11 @@ new("UIListLayout", {
 	Padding = UDimN(0, 8),
 })
 
+-- OFF icon
 new("ImageLabel", {
 	Name = "OFF",
 	Parent = layout1,
-	Image = getcustomasset and getcustomasset("95222964296464.png") or "rbxassetid://95222964296464",
+	Image = getcustomasset and getcustomasset("Violet/Assets/95222964296464.png") or "rbxassetid://95222964296464",
 	BackgroundTransparency = 1,
 	Position = UDim2n(0, 10, 0, 9),
 	Size = UDim2n(0, 12, 0, 12),
@@ -124,10 +128,11 @@ new("ImageLabel", {
 	ZIndex = 3,
 })
 
+-- ON icon
 new("ImageLabel", {
 	Name = "ON",
 	Parent = layout1,
-  Image = getcustomasset and getcustomasset("114069756293603.png") or "rbxassetid://114069756293603",
+    Image = getcustomasset and getcustomasset("Violet/Assets/114069756293603.png") or "rbxassetid://114069756293603",
 	BackgroundTransparency = 1,
 	Position = UDim2n(0, 22, 0, 5),
 	Size = UDim2n(0, 20, 0, 20),
@@ -194,6 +199,7 @@ new("TextLabel", {
 	Size = UDim2n(0, 0, 1, 0),
 })
 
+-- layout2 (right-side toggles: Logging / Stacking)
 local layout2 = new("Frame", {
 	Name = "layout2",
 	Parent = Top,
@@ -210,6 +216,7 @@ new("UIListLayout", {
 	Padding = UDimN(0, 10),
 })
 
+-- helper to build a toggle pill
 local function makeToggle(name, labelText, bgColor, circleColor, parent)
 	local t = new("Frame", {
 		Name = name,
@@ -377,6 +384,7 @@ new("UIListLayout", {
 	VerticalAlignment = Enum.VerticalAlignment.Top,
 })
 
+-- Template log row (hidden — "logUn")
 local logUn = new("Frame", {
 	Name = "logUn",
 	Parent = scroll,
@@ -685,7 +693,7 @@ local Little = new("Frame", {
 new("ImageLabel", {
 	Name = "little",
 	Parent = Little,
-	Image = getcustomasset and getcustomasset("136563593316996.png") or "rbxassetid://136563593316996",
+	Image = getcustomasset and getcustomasset("Violet/Assets/136563593316996.png") or "rbxassetid://136563593316996",
 	BackgroundTransparency = 1,
 	Position = UDim2n(0, -24, 0, -24),
 	Size = UDim2n(0, 287, 0, 404),
@@ -709,8 +717,7 @@ local viewport = new("ViewportFrame", {
 	BackgroundTransparency = 1,
 	Ambient = C3RGB(200, 200, 200),
 	LightColor = C3RGB(140, 140, 140),
-	LightDirection = Vector3.new(-1, -1, -1),
-	CameraFieldOfView = 61.225,
+	LightDirection = Vector3.new(-1, -1, -1)
 })
 
 local vpCamera = new("Camera", {
@@ -720,6 +727,11 @@ local vpCamera = new("Camera", {
 		* CFrame.Angles(math.rad(10), math.rad(180), 0),
 })
 viewport.CurrentCamera = vpCamera
+
+local rig = new("Model", {
+    Parent = viewport,
+    Name = "rig"
+})
 
 local littleLayout2 = new("Frame", {
 	Name = "layout2",
