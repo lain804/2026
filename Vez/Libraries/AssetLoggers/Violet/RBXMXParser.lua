@@ -121,10 +121,10 @@ end
 
 getgenv().Images = getgenv().Images or {}
 
-local ASSETS_ROOT   = "Crimson"
-local ASSETS_FOLDER = "Crimson/Assets"
+local ASSETS_ROOT   = "Violet"
+local ASSETS_FOLDER = "Violet/Assets"
 local ASSET_LOGGER_BASE =
-	"https://raw.githubusercontent.com/Vezise/2026/main/Vez/Libraries/AssetLoggers/Crimson/Assets"
+	"https://raw.githubusercontent.com/Vezise/2026/main/Vez/Libraries/AssetLoggers/Violet/Assets"
 
 local function ensureAssetFolders()
 	if not isfolder(ASSETS_ROOT) then
