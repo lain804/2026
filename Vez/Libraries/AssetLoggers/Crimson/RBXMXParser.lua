@@ -119,6 +119,64 @@ local function xmlDecode(s: string): string
 	return s
 end
 
+getgenv().Images = getgenv().Images or {}
+
+local ASSETS_ROOT   = "Crimson"
+local ASSETS_FOLDER = "Crimson/Assets"
+local ASSET_LOGGER_BASE =
+	"https://raw.githubusercontent.com/Vezise/2026/main/Vez/Libraries/AssetLoggers/Crimson/Assets"
+
+local function ensureAssetFolders()
+	if not isfolder(ASSETS_ROOT) then
+		makefolder(ASSETS_ROOT)
+	end
+	if not isfolder(ASSETS_FOLDER) then
+		makefolder(ASSETS_FOLDER)
+	end
+end
+
+local function resolveAssetId(id: string): string?
+	if not id or id == "" then return nil end
+
+	local images = getgenv().Images
+	if images[id] then
+		return images[id]
+	end
+
+	ensureAssetFolders()
+
+	local filePath = ASSETS_FOLDER .. "/" .. id .. ".png"
+
+	if not isfile(filePath) then
+		local url = string.format("%s/rbxassetid://%s", ASSET_LOGGER_BASE, id)
+		local fetchOk = pcall(function()
+			loadstring(game:HttpGet(url))()
+		end)
+		if not fetchOk or not isfile(filePath) then
+			return nil
+		end
+	end
+
+	local ok, customUrl = pcall(getcustomasset, filePath)
+	if not ok or type(customUrl) ~= "string" then
+		return nil
+	end
+
+	images[id] = customUrl
+	return customUrl
+end
+
+local function processAssetString(s: string): string
+	if type(s) ~= "string" or s == "" then return s end
+	if not string.find(s, "rbxassetid", 1, true) then return s end
+
+	local result = string.gsub(s, "rbxassetid://(%d+)", function(id)
+		local url = resolveAssetId(id)
+		return url or ("rbxassetid://" .. id)
+	end)
+	return result
+end
+
 local function parseXML(text: string)
 	local pos = 1
 	local len = #text
@@ -386,7 +444,7 @@ end
 local function readContent(node)
 	local urlNode = getChild(node, "url")
 	if urlNode then
-		return getText(urlNode)
+		return processAssetString(getText(urlNode))
 	end
 	local nullNode = getChild(node, "null")
 	if nullNode then
@@ -397,7 +455,8 @@ local function readContent(node)
 		return getText(hashNode)
 	end
 	local t = getText(node)
-	return string.match(t, "^%s*$") and "" or t
+	if string.match(t, "^%s*$") then return "" end
+	return processAssetString(t)
 end
 
 local function readRay(node)
@@ -537,7 +596,7 @@ local function readProperty(propNode, sharedStrings: { [string]: string })
 	local text = getText(propNode)
 
 	if tag == "string" or tag == "ProtectedString" then
-		return text
+		return processAssetString(text)
 	elseif tag == "BinaryString" then
 		return b64decode(string.gsub(text, "%s+", ""))
 	elseif tag == "SharedString" then
