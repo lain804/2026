@@ -24,78 +24,85 @@ for _, Asset in Assets do
     end
 end
 
-local function new(class, props, children)
-	local inst = Instance.new(class)
-	if props then
-		for k, v in pairs(props) do
+local function new(className, props)
+	local inst = Instance.new(className)
+	local parent = nil
+	for k, v in pairs(props or {}) do
+		if k == "Parent" then
+			parent = v
+		else
 			inst[k] = v
 		end
 	end
-	if children then
-		for _, c in ipairs(children) do
-			c.Parent = inst
-		end
-	end
+	if parent then inst.Parent = parent end
 	return inst
 end
 
-local robotoBold   = Font.new("rbxasset://fonts/families/Roboto.json",     Enum.FontWeight.Bold,    Enum.FontStyle.Normal)
-local robotoReg    = Font.new("rbxasset://fonts/families/Roboto.json",     Enum.FontWeight.Regular, Enum.FontStyle.Normal)
-local robotoItalic = Font.new("rbxasset://fonts/families/Roboto.json",     Enum.FontWeight.Regular, Enum.FontStyle.Italic)
-local robotoMono   = Font.new("rbxasset://fonts/families/RobotoMono.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
-
-local ScreenGui = new("ScreenGui", {
+----------------------------------------------------------------
+-- ScreenGui
+----------------------------------------------------------------
+local AnimLoggerUI = new("ScreenGui", {
 	Name = "AnimLoggerUI",
 	ResetOnSpawn = true,
-	ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets,
 	ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+	ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets,
+	ClipToDeviceSafeArea = true,
 })
 
+----------------------------------------------------------------
+-- Background (main window)
+----------------------------------------------------------------
 local Background = new("Frame", {
 	Name = "Background",
-	Parent = ScreenGui,
+	Parent = AnimLoggerUI,
 	AnchorPoint = Vector2.new(0.5, 0.5),
 	Position = UDim2.fromScale(0.5, 0.5),
 	Size = UDim2.fromOffset(676, 451),
 	BackgroundTransparency = 1,
 	BorderSizePixel = 0,
 })
+Background:SetAttribute("Id", "122_6")
 
-new("UIAspectRatioConstraint", {
-	Parent = Background,
-	AspectRatio = 1.49889135,
-})
+-- backdrop image
 new("ImageLabel", {
 	Name = "back",
 	Parent = Background,
 	Image = getcustomasset and getcustomasset("Crimson/Assets/108453875048733.png") or "rbxassetid://108453875048733",
 	BackgroundTransparency = 1,
-	Position = UDim2n(0, -24, 0, -24),
-	Size = UDim2n(0, 725, 0, 500),
+	BorderSizePixel = 0,
+	Position = UDim2.fromOffset(-24, -24),
+	Size = UDim2.fromOffset(725, 500),
 	ZIndex = 0,
 })
 
+----------------------------------------------------------------
+-- Top bar
+----------------------------------------------------------------
 local top = new("ImageLabel", {
 	Name = "top",
 	Parent = Background,
 	Image = getcustomasset and getcustomasset("Crimson/Assets/82686076130111.png") or "rbxassetid://82686076130111",
 	BackgroundTransparency = 1,
-	BorderSizePixel = 1,
+	BorderSizePixel = 0,
+	Position = UDim2.fromOffset(0, 0),
 	Size = UDim2.fromOffset(676, 30),
 })
 
+-- layout1 (left side of top bar)
 local layout1 = new("Frame", {
 	Name = "layout1",
 	Parent = top,
 	BackgroundTransparency = 1,
 	Position = UDim2.fromOffset(8, 0),
 	Size = UDim2.fromScale(1, 1),
+	BorderSizePixel = 0,
 })
 
 new("UIListLayout", {
 	Parent = layout1,
 	FillDirection = Enum.FillDirection.Horizontal,
 	HorizontalAlignment = Enum.HorizontalAlignment.Left,
+	VerticalAlignment = Enum.VerticalAlignment.Center,
 	SortOrder = Enum.SortOrder.LayoutOrder,
 	Padding = UDim.new(0, 8),
 })
@@ -105,115 +112,134 @@ new("ImageLabel", {
 	Parent = layout1,
 	Image = getcustomasset and getcustomasset("Crimson/Assets/95222964296464.png") or "rbxassetid://95222964296464",
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.fromOffset(10, 9),
 	Size = UDim2.fromOffset(12, 12),
 	Visible = false,
 	ZIndex = 3,
+	LayoutOrder = 0,
 })
 
 new("ImageLabel", {
 	Name = "ON",
 	Parent = layout1,
-	Image = getcustomasset and getcustomasset("Crimson/Assets/114069756293603") or "rbxassetid://114069756293603",
+	Image = getcustomasset and getcustomasset("Crimson/Assets/114069756293603.png") or "rbxassetid://114069756293603",
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.fromOffset(22, 5),
 	Size = UDim2.fromOffset(20, 20),
 	ZIndex = 4,
+	LayoutOrder = 0,
 })
 
 new("TextLabel", {
 	Name = "title",
 	Parent = layout1,
-	FontFace = robotoBold,
+	FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal),
 	Text = "CRIMSON",
 	TextColor3 = Color3.new(1, 1, 1),
-	TextSize = 14,
 	TextTransparency = 0.24,
+	TextSize = 14,
 	TextXAlignment = Enum.TextXAlignment.Right,
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	AutomaticSize = Enum.AutomaticSize.X,
-	Size = UDim2.fromScale(0, 1),
+	Size = UDim2.new(0, 0, 1, 0),
 	LayoutOrder = 1,
 })
 
 new("TextLabel", {
 	Name = "dash",
 	Parent = layout1,
-	FontFace = robotoBold,
+	FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal),
 	Text = "-",
 	TextColor3 = Color3.new(1, 1, 1),
-	TextSize = 14,
 	TextTransparency = 0.24,
+	TextSize = 14,
 	TextXAlignment = Enum.TextXAlignment.Right,
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	AutomaticSize = Enum.AutomaticSize.X,
-	Size = UDim2.fromScale(0, 1),
+	Size = UDim2.new(0, 0, 1, 0),
 	LayoutOrder = 2,
 })
 
 new("TextLabel", {
 	Name = "ani",
 	Parent = layout1,
-	FontFace = robotoBold,
+	FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal),
 	Text = "Animation Logger",
 	TextColor3 = Color3.fromRGB(225, 67, 67),
-	TextSize = 14,
 	TextTransparency = 0.24,
+	TextSize = 14,
 	TextXAlignment = Enum.TextXAlignment.Right,
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	AutomaticSize = Enum.AutomaticSize.X,
-	Size = UDim2.fromScale(0, 1),
+	Size = UDim2.new(0, 0, 1, 0),
 	LayoutOrder = 3,
 })
 
 new("TextLabel", {
 	Name = "vez",
 	Parent = layout1,
-	FontFace = robotoItalic,
+	FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.Regular, Enum.FontStyle.Italic),
 	Text = "By Vez",
 	TextColor3 = Color3.new(1, 1, 1),
-	TextSize = 12,
 	TextTransparency = 0.58,
+	TextSize = 12,
 	TextXAlignment = Enum.TextXAlignment.Right,
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	AutomaticSize = Enum.AutomaticSize.X,
-	Size = UDim2.fromScale(0, 1),
+	Size = UDim2.new(0, 0, 1, 0),
 	LayoutOrder = 4,
 })
 
+-- layout2 (right side of top bar — toggles)
 local layout2 = new("Frame", {
 	Name = "layout2",
 	Parent = top,
 	BackgroundTransparency = 1,
 	Position = UDim2.fromOffset(-4, 0),
 	Size = UDim2.fromScale(1, 1),
+	BorderSizePixel = 0,
 })
 
 new("UIListLayout", {
 	Parent = layout2,
 	FillDirection = Enum.FillDirection.Horizontal,
 	HorizontalAlignment = Enum.HorizontalAlignment.Right,
+	VerticalAlignment = Enum.VerticalAlignment.Center,
 	SortOrder = Enum.SortOrder.LayoutOrder,
 	Padding = UDim.new(0, 10),
 })
 
-local function makeTogglePill(name, labelText)
-	local pill = new("Frame", {
+-- Reusable toggle builder (togglelog / togglestack)
+local function buildToggle(name, labelText, circleColor)
+	local holder = new("Frame", {
 		Name = name,
 		Parent = layout2,
 		AnchorPoint = Vector2.new(0, 0.5),
 		BackgroundColor3 = Color3.fromRGB(22, 10, 10),
+		BorderSizePixel = 0,
 		Size = UDim2.new(0, 65, 1, -8),
 		Visible = false,
 	})
-	new("UICorner", { Parent = pill, CornerRadius = UDim.new(0, 4) })
-	new("UIStroke", { Parent = pill, Color = Color3.new(1, 1, 1), Transparency = 0.92 })
+	new("UICorner", { Parent = holder, CornerRadius = UDim.new(0, 4) })
+	new("UIStroke", {
+		Parent = holder,
+		Color = Color3.new(1, 1, 1),
+		Thickness = 1,
+		Transparency = 0.92,
+	})
 
 	local contain = new("Frame", {
 		Name = "contain",
-		Parent = pill,
+		Parent = holder,
 		AnchorPoint = Vector2.new(0, 0.5),
 		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
 		Position = UDim2.new(0, 5, 0.5, 0),
 		Size = UDim2.fromOffset(10, 10),
 	})
@@ -224,55 +250,63 @@ local function makeTogglePill(name, labelText)
 		SortOrder = Enum.SortOrder.LayoutOrder,
 		Padding = UDim.new(0, 4),
 	})
+
 	local circle = new("Frame", {
 		Name = "circle",
 		Parent = contain,
 		AnchorPoint = Vector2.new(0, 0.5),
-		BackgroundColor3 = (name == "togglelog") and Color3.fromRGB(0, 170, 0) or Color3.fromRGB(50, 50, 50),
+		BackgroundColor3 = circleColor,
+		BorderSizePixel = 0,
 		Size = UDim2.fromOffset(8, 8),
 	})
 	new("UICorner", { Parent = circle, CornerRadius = UDim.new(1, 0) })
 
 	new("TextLabel", {
 		Parent = contain,
-		FontFace = robotoReg,
+		FontFace = Font.new("rbxasset://fonts/families/Roboto.json"),
 		Text = labelText,
 		TextColor3 = Color3.new(1, 1, 1),
-		TextSize = 11,
 		TextTransparency = 0.32,
+		TextSize = 11,
 		TextXAlignment = Enum.TextXAlignment.Right,
 		BackgroundTransparency = 1,
 		AutomaticSize = Enum.AutomaticSize.XY,
-		Size = UDim2.fromOffset(0, 0),
+		BorderSizePixel = 0,
+		Size = UDim2.new(0, 0, 0, 0),
 	})
 
 	new("TextButton", {
-		Parent = pill,
+		Parent = holder,
 		Text = "",
-		AutoButtonColor = true,
 		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
 		Position = UDim2.fromScale(0.5, 0.5),
 		Size = UDim2.fromScale(1, 1),
-		BackgroundTransparency = 1,
+		AutoButtonColor = true,
 		TextTransparency = 1,
 	})
 
 	local hover = new("Frame", {
 		Name = "hover",
-		Parent = pill,
+		Parent = holder,
 		AnchorPoint = Vector2.new(0.5, 0.5),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
 		Position = UDim2.fromScale(0.5, 0.5),
 		Size = UDim2.fromScale(1, 1),
-		BackgroundTransparency = 1,
 	})
 	new("UICorner", { Parent = hover, CornerRadius = UDim.new(0, 4) })
 
-	return pill
+	return holder
 end
 
-local togglelog   = makeTogglePill("togglelog",   "Logging")
-local togglestack = makeTogglePill("togglestack", "Stacking")
+buildToggle("togglelog",   "Logging",  Color3.fromRGB(0, 170, 0))
+buildToggle("togglestack", "Stacking", Color3.fromRGB(50, 50, 50))
 
+----------------------------------------------------------------
+-- Contain (body under the top bar)
+----------------------------------------------------------------
 local contain = new("Frame", {
 	Name = "contain",
 	Parent = Background,
@@ -282,15 +316,21 @@ local contain = new("Frame", {
 	Size = UDim2.fromOffset(676, 451),
 	ZIndex = 2,
 })
+contain:SetAttribute("Id", "125_92")
 
+----------------------------------------------------------------
+-- Left panel (Logged Assets list)
+----------------------------------------------------------------
 local left = new("Frame", {
 	Name = "left",
 	Parent = contain,
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.fromOffset(0, 30),
 	Size = UDim2.fromOffset(238, 421),
 })
 
+-- right divider line
 new("Frame", {
 	Name = "line",
 	Parent = left,
@@ -301,71 +341,75 @@ new("Frame", {
 	Size = UDim2.new(0, 1, 1, 0),
 })
 
+-- header "Logged Assets"
 local leftText = new("Frame", {
 	Name = "text",
 	Parent = left,
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Size = UDim2.new(1, 0, -0.11876484, 100),
 })
-
 new("TextLabel", {
 	Parent = leftText,
-	FontFace = robotoMono,
+	AnchorPoint = Vector2.new(0, 0.5),
+	FontFace = Font.new("rbxasset://fonts/families/RobotoMono.json"),
 	Text = "Logged Assets",
 	TextColor3 = Color3.new(1, 1, 1),
-	TextSize = 15,
 	TextTransparency = 0.66,
+	TextSize = 15,
 	TextXAlignment = Enum.TextXAlignment.Left,
-	AnchorPoint = Vector2.new(0, 0.5),
 	BackgroundTransparency = 1,
 	Position = UDim2.new(0, 15, 0.5, 0),
 	Size = UDim2.fromOffset(200, 50),
+	BorderSizePixel = 0,
 })
-
 new("Frame", {
 	Name = "line",
 	Parent = leftText,
 	AnchorPoint = Vector2.new(0.5, 1),
 	BackgroundColor3 = Color3.fromRGB(22, 22, 22),
 	BorderSizePixel = 0,
-	Position = UDim2.fromScale(0.5, 1),
+	Position = UDim2.new(0.5, 0, 1, 0),
 	Size = UDim2.new(1, 0, 0, 1),
 })
 
-local leftList = new("Frame", {
+-- scroll container
+local leftContain = new("Frame", {
 	Name = "contain",
 	Parent = left,
 	BackgroundTransparency = 1,
-	Position = UDim2.new(0, 0, 0.11876484, 0),
+	BorderSizePixel = 0,
+	Position = UDim2.new(0, 0, 0.118764848, 0),
 	Size = UDim2.fromOffset(236, 322),
 })
 
-local scroll = new("ScrollingFrame", {
-	Parent = leftList,
+local ScrollingFrame = new("ScrollingFrame", {
+	Parent = leftContain,
 	AnchorPoint = Vector2.new(0.5, 0.5),
-	Position = UDim2.fromScale(0.5, 0.5),
-	Size = UDim2.new(1, -20, 1, -20),
 	BackgroundTransparency = 1,
 	BorderSizePixel = 0,
-	ClipsDescendants = true,
-	ScrollBarThickness = 0,
-	ScrollBarImageColor3 = Color3.new(0, 0, 0),
-	ScrollingDirection = Enum.ScrollingDirection.Y,
+	Position = UDim2.fromScale(0.5, 0.5),
+	Size = UDim2.new(1, -20, 1, -20),
 	AutomaticCanvasSize = Enum.AutomaticSize.Y,
 	CanvasSize = UDim2.new(),
+	ScrollBarThickness = 0,
+	ScrollingDirection = Enum.ScrollingDirection.Y,
+	ClipsDescendants = true,
+	ScrollBarImageColor3 = Color3.new(0, 0, 0),
 })
-
 new("UIListLayout", {
-	Parent = scroll,
+	Parent = ScrollingFrame,
 	FillDirection = Enum.FillDirection.Vertical,
-	SortOrder = Enum.SortOrder.LayoutOrder,
+	HorizontalAlignment = Enum.HorizontalAlignment.Left,
 	VerticalAlignment = Enum.VerticalAlignment.Top,
+	SortOrder = Enum.SortOrder.LayoutOrder,
 	Padding = UDim.new(0, 0),
 })
 
+-- Template log row "logUn" (hidden, clone on demand)
 local logUn = new("Frame", {
 	Name = "logUn",
-	Parent = scroll,
+	Parent = ScrollingFrame,
 	BackgroundColor3 = Color3.fromRGB(20, 4, 4),
 	BackgroundTransparency = 1,
 	BorderSizePixel = 0,
@@ -374,72 +418,80 @@ local logUn = new("Frame", {
 	Visible = false,
 })
 
-local logEntry = new("Frame", {
+local log = new("Frame", {
 	Name = "log",
 	Parent = logUn,
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Size = UDim2.new(1, 0, 0, 33),
 })
 new("UIStroke", {
-	Parent = logEntry,
-	Color = Color3.fromRGB(22, 22, 22),
+	Parent = log,
 	ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual,
-	LineJoinMode = Enum.LineJoinMode.Round,
+	Color = Color3.fromRGB(22, 22, 22),
+	Thickness = 1,
 })
-new("UICorner", { Parent = logEntry, CornerRadius = UDim.new(0, 5) })
+new("UICorner", { Parent = log, CornerRadius = UDim.new(0, 5) })
 
 new("TextButton", {
 	Name = "vutton",
-	Parent = logEntry,
-	Text = "",
-	AutoButtonColor = false,
+	Parent = log,
 	AnchorPoint = Vector2.new(0.5, 0.5),
+	AutoButtonColor = false,
+	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.fromScale(0.5, 0.5),
 	Size = UDim2.fromScale(1, 1),
-	BackgroundTransparency = 1,
+	Text = "",
 	TextTransparency = 1,
 })
 
 new("TextLabel", {
-	Parent = logEntry,
-	FontFace = robotoMono,
+	Parent = log,
+	AnchorPoint = Vector2.new(0, 0.5),
+	FontFace = Font.new("rbxasset://fonts/families/RobotoMono.json"),
 	Text = "rbxassetid://0",
 	TextColor3 = Color3.fromRGB(115, 119, 129),
 	TextSize = 14,
 	TextXAlignment = Enum.TextXAlignment.Left,
-	AnchorPoint = Vector2.new(0, 0.5),
-	BackgroundTransparency = 1,
 	AutomaticSize = Enum.AutomaticSize.X,
+	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.new(0, 10, 0.5, 0),
 	Size = UDim2.new(0, 0, 1, 0),
 })
 
-local hover = new("Frame", {
+local logHover = new("Frame", {
 	Name = "hover",
-	Parent = logEntry,
+	Parent = log,
 	AnchorPoint = Vector2.new(0.5, 0.5),
+	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.fromScale(0.5, 0.5),
 	Size = UDim2.fromScale(1, 1),
-	BackgroundTransparency = 1,
 })
-new("UICorner", { Parent = hover, CornerRadius = UDim.new(0, 4) })
+new("UICorner", { Parent = logHover, CornerRadius = UDim.new(0, 4) })
 
 new("TextLabel", {
 	Name = "multi",
-	Parent = logEntry,
-	FontFace = robotoMono,
+	Parent = log,
+	AnchorPoint = Vector2.new(1, 0.5),
+	FontFace = Font.new("rbxasset://fonts/families/RobotoMono.json"),
 	Text = "x2",
 	TextColor3 = Color3.fromRGB(0, 170, 0),
 	TextSize = 14,
 	TextXAlignment = Enum.TextXAlignment.Center,
-	AnchorPoint = Vector2.new(1, 0.5),
 	AutomaticSize = Enum.AutomaticSize.X,
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.new(1, -10, 0.5, 0),
 	Size = UDim2.new(0, 0, 1, 0),
 	Visible = false,
 })
 
+----------------------------------------------------------------
+-- Bottom bar (Clear Logs)
+----------------------------------------------------------------
 local bottom = new("Frame", {
 	Name = "bottom",
 	Parent = contain,
@@ -460,17 +512,17 @@ new("Frame", {
 	Size = UDim2.new(1, 0, 0, 1),
 })
 
-local btnContain = new("Frame", {
+local bottomContain = new("Frame", {
 	Name = "contain",
 	Parent = bottom,
 	AnchorPoint = Vector2.new(0.5, 0.5),
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.fromScale(0.5, 0.5),
 	Size = UDim2.new(1, -19, 1, 0),
 })
-
 new("UIListLayout", {
-	Parent = btnContain,
+	Parent = bottomContain,
 	FillDirection = Enum.FillDirection.Horizontal,
 	HorizontalAlignment = Enum.HorizontalAlignment.Right,
 	SortOrder = Enum.SortOrder.LayoutOrder,
@@ -479,60 +531,69 @@ new("UIListLayout", {
 
 local clearBtn = new("Frame", {
 	Name = "clear",
-	Parent = btnContain,
+	Parent = bottomContain,
 	BackgroundColor3 = Color3.fromRGB(153, 0, 0),
 	BackgroundTransparency = 1,
-	Size = UDim2.new(0, 100, 1, -20),
+	BorderSizePixel = 0,
 	LayoutOrder = 1,
+	Size = UDim2.new(0, 100, 1, -20),
 	Visible = false,
 })
 new("UICorner", { Parent = clearBtn, CornerRadius = UDim.new(0, 4) })
-new("UIStroke", { Parent = clearBtn, Color = Color3.fromRGB(45, 53, 66) })
-
+new("UIStroke", {
+	Parent = clearBtn,
+	Color = Color3.fromRGB(45, 53, 66),
+	Thickness = 1,
+})
 new("TextLabel", {
 	Parent = clearBtn,
-	FontFace = robotoBold,
+	AnchorPoint = Vector2.new(0.5, 0.5),
+	FontFace = Font.new("rbxasset://fonts/families/Roboto.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal),
 	Text = "Clear Logs",
 	TextColor3 = Color3.new(1, 1, 1),
-	TextSize = 14,
 	TextTransparency = 0.16,
+	TextSize = 14,
 	TextXAlignment = Enum.TextXAlignment.Right,
-	AnchorPoint = Vector2.new(0.5, 0.5),
 	AutomaticSize = Enum.AutomaticSize.XY,
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.fromScale(0.5, 0.5),
+	Size = UDim2.new(),
 })
-
 new("TextButton", {
 	Parent = clearBtn,
-	Text = "",
 	AnchorPoint = Vector2.new(0.5, 0.5),
+	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.fromScale(0.5, 0.5),
 	Size = UDim2.fromScale(1, 1),
-	BackgroundTransparency = 1,
+	Text = "",
 	TextTransparency = 1,
 })
-
 local clearHover = new("Frame", {
 	Name = "hover",
 	Parent = clearBtn,
 	AnchorPoint = Vector2.new(0.5, 0.5),
+	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.fromScale(0.5, 0.5),
 	Size = UDim2.fromScale(1, 1),
-	BackgroundTransparency = 1,
 })
 new("UICorner", { Parent = clearHover, CornerRadius = UDim.new(0, 4) })
 
 new("Frame", {
 	Name = "line",
-	Parent = btnContain,
+	Parent = bottomContain,
 	BackgroundColor3 = Color3.fromRGB(29, 29, 29),
 	BorderSizePixel = 0,
-	Size = UDim2.new(0, 2, 1, -35),
 	LayoutOrder = 1,
+	Size = UDim2.new(0, 2, 1, -35),
 	Visible = false,
 })
 
+----------------------------------------------------------------
+-- Center panel (asset details: Name / Length / Priority / Action / Looped)
+----------------------------------------------------------------
 local center = new("Frame", {
 	Name = "center",
 	Parent = contain,
@@ -542,18 +603,18 @@ local center = new("Frame", {
 	Size = UDim2.fromOffset(438, 363),
 })
 
-local centerContain = new("Frame", {
+local centerInner = new("Frame", {
 	Name = "contain",
 	Parent = center,
 	AnchorPoint = Vector2.new(0.5, 0.5),
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.fromScale(0.5, 0.5),
 	Size = UDim2.new(1, -30, 1, -30),
 	Visible = false,
 })
-
 new("UIListLayout", {
-	Parent = centerContain,
+	Parent = centerInner,
 	FillDirection = Enum.FillDirection.Vertical,
 	HorizontalAlignment = Enum.HorizontalAlignment.Center,
 	VerticalAlignment = Enum.VerticalAlignment.Center,
@@ -561,14 +622,17 @@ new("UIListLayout", {
 	Padding = UDim.new(0, 10),
 })
 
-local function makePropRow(propName, propValue, valueColor)
-	local frame = new("Frame", {
-		Parent = centerContain,
+-- Field helper: prop label + big value
+local function buildField(parent, propText, valueText, frameName)
+	local f = new("Frame", {
+		Name = frameName,
+		Parent = parent,
 		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
 		Size = UDim2.fromOffset(159, 58),
 	})
 	new("UIListLayout", {
-		Parent = frame,
+		Parent = f,
 		FillDirection = Enum.FillDirection.Vertical,
 		HorizontalAlignment = Enum.HorizontalAlignment.Center,
 		VerticalAlignment = Enum.VerticalAlignment.Center,
@@ -577,79 +641,73 @@ local function makePropRow(propName, propValue, valueColor)
 	})
 	new("TextLabel", {
 		Name = "prop",
-		Parent = frame,
-		FontFace = robotoMono,
-		Text = propName,
+		Parent = f,
+		FontFace = Font.new("rbxasset://fonts/families/RobotoMono.json"),
+		Text = propText,
 		TextColor3 = Color3.new(1, 1, 1),
-		TextSize = 15,
 		TextTransparency = 0.45,
+		TextSize = 15,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextYAlignment = Enum.TextYAlignment.Top,
 		AutomaticSize = Enum.AutomaticSize.XY,
 		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.new(),
 	})
 	new("TextLabel", {
 		Name = "value",
-		Parent = frame,
-		FontFace = robotoReg,
-		Text = propValue,
-		TextColor3 = valueColor or Color3.new(1, 1, 1),
+		Parent = f,
+		FontFace = Font.new("rbxasset://fonts/families/Roboto.json"),
+		Text = valueText,
+		TextColor3 = Color3.new(1, 1, 1),
 		TextSize = 24,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextYAlignment = Enum.TextYAlignment.Top,
 		AutomaticSize = Enum.AutomaticSize.XY,
 		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.new(),
 	})
-	return frame
+	return f
 end
 
-local row1 = new("Frame", {
-	Parent = centerContain,
+-- Row: Name
+buildField(centerInner, "Name", "Animation", "name")
+
+-- Row: Length + Priority + Action
+local row = new("Frame", {
+	Name = "contain",
+	Parent = centerInner,
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Size = UDim2.fromOffset(159, 58),
 })
 new("UIListLayout", {
-	Parent = row1,
+	Parent = row,
 	FillDirection = Enum.FillDirection.Horizontal,
 	HorizontalAlignment = Enum.HorizontalAlignment.Center,
 	VerticalAlignment = Enum.VerticalAlignment.Center,
 	SortOrder = Enum.SortOrder.LayoutOrder,
 	Padding = UDim.new(0, 30),
 })
+buildField(row, "Length",   "0:30:0",   "length")
+buildField(row, "Priority", "Action",   "priority")
 
-makePropRow("Name",   "Animation"):SetAttribute("LayoutOrder", 0)
-
-local row2 = new("Frame", {
-	Parent = centerContain,
-	BackgroundTransparency = 1,
-	Size = UDim2.fromOffset(159, 58),
-})
-new("UIListLayout", {
-	Parent = row2,
-	FillDirection = Enum.FillDirection.Horizontal,
-	HorizontalAlignment = Enum.HorizontalAlignment.Center,
-	VerticalAlignment = Enum.VerticalAlignment.Center,
-	SortOrder = Enum.SortOrder.LayoutOrder,
-	Padding = UDim.new(0, 30),
-})
-
-local lengthFrame   = makePropRow("Length",   "0:30:0")
-lengthFrame.Parent = row2
-local priorityFrame = makePropRow("Priority", "Action")
-priorityFrame.Parent = row2
-
+-- bottom inner divider
 new("Frame", {
 	Name = "line",
-	Parent = centerContain,
+	Parent = centerInner,
 	BackgroundColor3 = Color3.fromRGB(22, 22, 22),
 	BorderSizePixel = 0,
 	Size = UDim2.new(1, 0, 0, 1),
 })
 
+-- Row: Looped  True/False
 local propdif = new("Frame", {
 	Name = "propdif",
-	Parent = centerContain,
+	Parent = centerInner,
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.new(0, 0, 0.441441447, 0),
 	Size = UDim2.new(1, 0, 0, 15),
 	Visible = false,
@@ -657,45 +715,64 @@ local propdif = new("Frame", {
 new("TextLabel", {
 	Name = "name",
 	Parent = propdif,
-	FontFace = robotoMono,
+	AnchorPoint = Vector2.new(0, 0.5),
+	FontFace = Font.new("rbxasset://fonts/families/RobotoMono.json"),
 	Text = "Looped",
 	TextColor3 = Color3.new(1, 1, 1),
 	TextSize = 14,
 	TextXAlignment = Enum.TextXAlignment.Right,
-	AnchorPoint = Vector2.new(0, 0.5),
 	AutomaticSize = Enum.AutomaticSize.XY,
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.new(0, 0, 0.5, 0),
+	Size = UDim2.new(),
 })
 new("TextLabel", {
 	Name = "value",
 	Parent = propdif,
-	FontFace = robotoMono,
+	AnchorPoint = Vector2.new(1, 0.5),
+	FontFace = Font.new("rbxasset://fonts/families/RobotoMono.json"),
 	Text = "True",
 	TextColor3 = Color3.fromRGB(0, 170, 0),
 	TextSize = 14,
 	TextXAlignment = Enum.TextXAlignment.Right,
-	AnchorPoint = Vector2.new(1, 0.5),
 	AutomaticSize = Enum.AutomaticSize.XY,
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.new(1, 0, 0.5, 0),
+	Size = UDim2.new(),
 })
 
+----------------------------------------------------------------
+-- Aspect ratio on the Background
+----------------------------------------------------------------
+new("UIAspectRatioConstraint", {
+	Parent = Background,
+	AspectRatio = 1.49889135,
+	AspectType = Enum.AspectType.FitWithinMaxSize,
+	DominantAxis = Enum.DominantAxis.Width,
+})
+
+----------------------------------------------------------------
+-- "little" side panel (viewport + rig)
+----------------------------------------------------------------
 local little = new("Frame", {
 	Name = "little",
 	Parent = Background,
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.fromOffset(-258, 48),
 	Size = UDim2.fromOffset(238, 355),
 	ZIndex = 5,
 })
+little:SetAttribute("Id", "170_2")
 
 new("ImageLabel", {
 	Name = "little",
 	Parent = little,
-	Image = getcustomasset and getcustomasset("Violet/Assets/136563593316996.png") or "rbxassetid://136563593316996",
-
+	Image = getcustomasset and getcustomasset("Crimson/Assets/136563593316996.png") or "rbxassetid://136563593316996",
 	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.fromOffset(-24, -24),
 	Size = UDim2.fromOffset(287, 404),
 	ZIndex = 0,
@@ -709,95 +786,73 @@ local littleContain = new("Frame", {
 	BorderSizePixel = 0,
 	Size = UDim2.fromOffset(238, 355),
 })
+littleContain:SetAttribute("Id", "170_3")
 
 local viewport = new("ViewportFrame", {
 	Parent = littleContain,
 	AnchorPoint = Vector2.new(0.5, 0.5),
+	BackgroundTransparency = 1,
+	BorderSizePixel = 0,
 	Position = UDim2.fromScale(0.5, 0.5),
 	Size = UDim2.fromScale(1, 1),
-	BackgroundTransparency = 1,
 	Ambient = Color3.fromRGB(200, 200, 200),
 	LightColor = Color3.fromRGB(140, 140, 140),
-	LightDirection = Vector3.new(-1, -1, -1)
+	LightDirection = Vector3.new(-1, -1, -1),
+	CameraFieldOfView = 61.2252426,
 })
 
-local vpCamera = Instance.new("Camera")
-vpCamera.CFrame = CFrame.new(0.2037, 3.9809, 9.9683)
-	* CFrame.fromMatrix(
-		Vector3.zero,
-		Vector3.new(-1, 0, 8.7423e-08),
-		Vector3.new(1.5181e-08, 0.98481, 0.17365),
-		Vector3.new(-8.6095e-08, 0.17365, -0.98481)
-	)
-vpCamera.FieldOfView = 61.2252426
-vpCamera.Parent = viewport
+local vpCamera = new("Camera", {
+	Parent = viewport,
+	CFrame = CFrame.new(0.203681, 3.980934, 9.968262) * CFrame.Angles(math.rad(-10), math.rad(180), 0),
+	FieldOfView = 61.2252426,
+})
 viewport.CurrentCamera = vpCamera
 
 local worldModel = new("WorldModel", { Name = "WorldModel", Parent = viewport })
-
+----------------------------------------------------------------
+-- Rig (R6 dummy inside viewport)
+----------------------------------------------------------------
 local Rig = new("Model", { Name = "Rig", Parent = worldModel })
 
 local function makePart(props)
 	local p = Instance.new("Part")
-	p.Anchored = false
-	p.CanCollide   = props.CanCollide ~= false
-	p.TopSurface   = Enum.SurfaceType.Smooth
-	p.BottomSurface= Enum.SurfaceType.Smooth
-	p.Material = Enum.Material.Plastic
-	p.Color= Color3.fromRGB(163, 162, 165)
-	p.Size = props.Size
-	p.CFrame   = props.CFrame
-	p.Name = props.Name
-	p.Parent   = Rig
+	p.Anchored      = false
+	p.CanCollide    = props.CanCollide ~= false
+	p.TopSurface    = Enum.SurfaceType.Smooth
+	p.BottomSurface = Enum.SurfaceType.Smooth
+	p.Material      = Enum.Material.Plastic
+	p.Color         = Color3.fromRGB(163, 162, 165)
+	p.Size          = props.Size
+	p.CFrame        = props.CFrame
+	p.Name          = props.Name
+	p.Parent        = Rig
 	return p
 end
 
 local Torso = makePart({
-	Name   = "Torso",
-	Size   = Vector3.new(2, 2, 1),
+	Name = "Torso", Size = Vector3.new(2, 2, 1),
 	CFrame = CFrame.new(0.130892411, 3, 17.281414),
 })
 
 local Head = makePart({
-	Name   = "Head",
-	Size   = Vector3.new(2, 1, 1),
+	Name = "Head", Size = Vector3.new(2, 1, 1),
 	CFrame = CFrame.new(0.130892411, 4.5, 17.281414),
 })
 local headMesh = Instance.new("SpecialMesh")
 headMesh.MeshType = Enum.MeshType.Head
-headMesh.Scale= Vector3.new(1.25, 1.25, 1.25)
-headMesh.Parent   = Head
+headMesh.Scale = Vector3.new(1.25, 1.25, 1.25)
+headMesh.Parent = Head
 
 local face = Instance.new("Decal")
-face.Name= "face"
+face.Name    = "face"
 face.Texture = "rbxasset://textures/face.png"
-face.Face= Enum.NormalId.Front
+face.Face    = Enum.NormalId.Front
 face.Parent  = Head
 
-local LeftArm = makePart({
-	Name = "Left Arm",
-	Size = Vector3.new(1, 2, 1),
-	CFrame = CFrame.new(-1.3691076, 3, 17.281414),
-	CanCollide = false,
-})
-local RightArm = makePart({
-	Name = "Right Arm",
-	Size = Vector3.new(1, 2, 1),
-	CFrame = CFrame.new(1.6308924, 3, 17.281414),
-	CanCollide = false,
-})
-local LeftLeg = makePart({
-	Name = "Left Leg",
-	Size = Vector3.new(1, 2, 1),
-	CFrame = CFrame.new(-0.369107604, 1, 17.281414),
-	CanCollide = false,
-})
-local RightLeg = makePart({
-	Name = "Right Leg",
-	Size = Vector3.new(1, 2, 1),
-	CFrame = CFrame.new(0.630892396, 1, 17.281414),
-	CanCollide = false,
-})
+local LeftArm  = makePart({ Name = "Left Arm",  Size = Vector3.new(1,2,1), CFrame = CFrame.new(-1.3691076, 3, 17.281414), CanCollide = false })
+local RightArm = makePart({ Name = "Right Arm", Size = Vector3.new(1,2,1), CFrame = CFrame.new( 1.6308924, 3, 17.281414), CanCollide = false })
+local LeftLeg  = makePart({ Name = "Left Leg",  Size = Vector3.new(1,2,1), CFrame = CFrame.new(-0.369107604, 1, 17.281414), CanCollide = false })
+local RightLeg = makePart({ Name = "Right Leg", Size = Vector3.new(1,2,1), CFrame = CFrame.new( 0.630892396, 1, 17.281414), CanCollide = false })
 
 local HRP = makePart({
 	Name = "HumanoidRootPart",
@@ -806,15 +861,13 @@ local HRP = makePart({
 	CanCollide = false,
 })
 HRP.Transparency = 1
-HRP.Color = Color3.fromRGB(165, 165, 165)
-
 Rig.PrimaryPart = HRP
 
-local function motor(name, parent, part0, part1, c0, c1)
+local function motor(name, parent, p0, p1, c0, c1)
 	local m = Instance.new("Motor6D")
 	m.Name = name
-	m.Part0 = part0
-	m.Part1 = part1
+	m.Part0 = p0
+	m.Part1 = p1
 	m.C0 = c0
 	m.C1 = c1
 	m.MaxVelocity = 0.1
@@ -826,21 +879,21 @@ local rShoulderC0 = CFrame.new( 1, 0.5, 0) * CFrame.fromMatrix(Vector3.zero, Vec
 local rShoulderC1 = CFrame.new(-0.5, 0.5, 0) * CFrame.fromMatrix(Vector3.zero, Vector3.new(0,0,-1), Vector3.new(0,1,0))
 local lShoulderC0 = CFrame.new(-1, 0.5, 0) * CFrame.fromMatrix(Vector3.zero, Vector3.new(0,0, 1), Vector3.new(0,1,0))
 local lShoulderC1 = CFrame.new( 0.5, 0.5, 0) * CFrame.fromMatrix(Vector3.zero, Vector3.new(0,0, 1), Vector3.new(0,1,0))
-local rHipC0 = CFrame.new( 1, -1, 0) * CFrame.fromMatrix(Vector3.zero, Vector3.new(0,0,-1), Vector3.new(0,1,0))
-local rHipC1 = CFrame.new( 0.5, 1, 0) * CFrame.fromMatrix(Vector3.zero, Vector3.new(0,0,-1), Vector3.new(0,1,0))
-local lHipC0 = CFrame.new(-1, -1, 0) * CFrame.fromMatrix(Vector3.zero, Vector3.new(0,0, 1), Vector3.new(0,1,0))
-local lHipC1 = CFrame.new(-0.5, 1, 0) * CFrame.fromMatrix(Vector3.zero, Vector3.new(0,0, 1), Vector3.new(0,1,0))
-local neckC0 = CFrame.new(0, 1, 0) * CFrame.fromMatrix(Vector3.zero, Vector3.new(-1,0,0), Vector3.new(0,0,1))
-local neckC1 = CFrame.new(0, -0.5, 0) * CFrame.fromMatrix(Vector3.zero, Vector3.new(-1,0,0), Vector3.new(0,0,1))
-local rootC0 = CFrame.new(0, 0, 0) * CFrame.fromMatrix(Vector3.zero, Vector3.new(-1,0,0), Vector3.new(0,0,1))
-local rootC1 = rootC0
+local rHipC0      = CFrame.new( 1, -1, 0) * CFrame.fromMatrix(Vector3.zero, Vector3.new(0,0,-1), Vector3.new(0,1,0))
+local rHipC1      = CFrame.new( 0.5, 1, 0) * CFrame.fromMatrix(Vector3.zero, Vector3.new(0,0,-1), Vector3.new(0,1,0))
+local lHipC0      = CFrame.new(-1, -1, 0) * CFrame.fromMatrix(Vector3.zero, Vector3.new(0,0, 1), Vector3.new(0,1,0))
+local lHipC1      = CFrame.new(-0.5, 1, 0) * CFrame.fromMatrix(Vector3.zero, Vector3.new(0,0, 1), Vector3.new(0,1,0))
+local neckC0      = CFrame.new(0, 1, 0)   * CFrame.fromMatrix(Vector3.zero, Vector3.new(-1,0,0), Vector3.new(0,0,1))
+local neckC1      = CFrame.new(0, -0.5, 0) * CFrame.fromMatrix(Vector3.zero, Vector3.new(-1,0,0), Vector3.new(0,0,1))
+local rootC0      = CFrame.fromMatrix(Vector3.zero, Vector3.new(-1,0,0), Vector3.new(0,0,1))
+local rootC1      = rootC0
 
 motor("Right Shoulder", Torso, Torso, RightArm, rShoulderC0, rShoulderC1)
 motor("Left Shoulder",  Torso, Torso, LeftArm,  lShoulderC0, lShoulderC1)
-motor("Right Hip", Torso, Torso, RightLeg, rHipC0, rHipC1)
-motor("Left Hip",  Torso, Torso, LeftLeg,  lHipC0, lHipC1)
-motor("Neck", Torso, Torso, Head, neckC0, neckC1)
-motor("RootJoint", HRP,   HRP,   Torso,rootC0, rootC1)
+motor("Right Hip",      Torso, Torso, RightLeg, rHipC0, rHipC1)
+motor("Left Hip",       Torso, Torso, LeftLeg,  lHipC0, lHipC1)
+motor("Neck",           Torso, Torso, Head,     neckC0, neckC1)
+motor("RootJoint",      HRP,   HRP,   Torso,    rootC0, rootC1)
 
 local Humanoid = Instance.new("Humanoid")
 Humanoid.RigType = Enum.HumanoidRigType.R6
@@ -850,14 +903,17 @@ local Animator = Instance.new("Animator")
 Animator.Parent = Humanoid
 
 local BodyColors = Instance.new("BodyColors")
-BodyColors.HeadColor3 = Color3.new(0.5, 0.5, 0.5)
-BodyColors.TorsoColor3 = Color3.new(0.5, 0.5, 0.5)
-BodyColors.LeftArmColor3 = Color3.new(0.5, 0.5, 0.5)
+BodyColors.HeadColor3     = Color3.new(0.5, 0.5, 0.5)
+BodyColors.TorsoColor3    = Color3.new(0.5, 0.5, 0.5)
+BodyColors.LeftArmColor3  = Color3.new(0.5, 0.5, 0.5)
 BodyColors.RightArmColor3 = Color3.new(0.5, 0.5, 0.5)
-BodyColors.LeftLegColor3 = Color3.new(0.5, 0.5, 0.5)
+BodyColors.LeftLegColor3  = Color3.new(0.5, 0.5, 0.5)
 BodyColors.RightLegColor3 = Color3.new(0.5, 0.5, 0.5)
 BodyColors.Parent = Rig
 
+----------------------------------------------------------------
+-- Parent
+----------------------------------------------------------------
 AnimLoggerUI.Parent = game:GetService("CoreGui")
 
 return AnimLoggerUI
