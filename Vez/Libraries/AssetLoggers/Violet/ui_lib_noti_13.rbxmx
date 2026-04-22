@@ -580,7 +580,7 @@
 							<int name="MaxVisibleGraphemes">-1</int>
 							<string name="OpenTypeFeatures"></string>
 							<bool name="RichText">false</bool>
-							<string name="Text">CRIMSON</string>
+							<string name="Text">VIOLET</string>
 							<Color3 name="TextColor3">
 								<R>1</R>
 								<G>1</G>
@@ -675,11 +675,11 @@
 							<int name="MaxVisibleGraphemes">-1</int>
 							<string name="OpenTypeFeatures"></string>
 							<bool name="RichText">false</bool>
-							<string name="Text">Animation Logger</string>
+							<string name="Text">Sound Logger</string>
 							<Color3 name="TextColor3">
-								<R>0.882352948</R>
-								<G>0.262745112</G>
-								<B>0.262745112</B>
+								<R>0.498</R>
+								<G>0</G>
+								<B>1</B>
 							</Color3>
 							<token name="TextDirection">0</token>
 							<bool name="TextScaled">false</bool>
@@ -1022,9 +1022,9 @@
 							</Vector2>
 							<token name="AutomaticSize">0</token>
 							<Color3 name="BackgroundColor3">
-								<R>0.0862745121</R>
-								<G>0.0392156877</G>
-								<B>0.0392156877</B>
+								<R>0.050980392156863</R>
+								<G>0</G>
+								<B>0.101960784313725</B>
 							</Color3>
 							<float name="BackgroundTransparency">0</float>
 							<Color3 name="BorderColor3">
