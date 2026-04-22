@@ -730,7 +730,7 @@ viewport.CurrentCamera = vpCamera
 
 local rig = new("Model", {
     Parent = viewport,
-    Name = "rig"
+    Name = "Rig"
 })
 
 local littleLayout2 = new("Frame", {
