@@ -13,6 +13,7 @@ local existing = CoreGui:FindFirstChild("SoundLoggerUI")
 if existing then existing:Destroy() end
 
 local RBXMXParser = load("RBXMXParser.lua")
+task.wait(1)
 local SoundLoggerUI = RBXMXParser.Deserialize(fetch("ui_lib_noti_13.rbxmx"), CoreGui)[1]
 
 local ActiveTweens = {}
