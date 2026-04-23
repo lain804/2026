@@ -45,14 +45,20 @@ end
 do
 	local worldModel = SoundLoggerUI.Background.little.contain.ViewportFrame.WorldModel
 	local rig = worldModel.Rig
+	local hrp = rig.HumanoidRootPart
+	hrp.Parent = nil
 	rig:Destroy()
 
 	local clone = Instance.new("Model")
 	clone.Name = "ViewModel"
     clone.Parent = worldModel
+	hrp.Parent = clone
 
 	local primaryPart = Instance.new("Part")
 	primaryPart.Name = "PrimaryPart"
+	primaryPart.Parent = clone
+	primaryPart.Position = hrp.Position
+	hrp:Destroy()
 	primaryPart.Anchored = true
 	primaryPart.Transparency = 1
 end
