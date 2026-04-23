@@ -8,7 +8,7 @@ local Assets = {
 	"139816139131321.png";
 }
 
-local URL = "https://github.com/Vezise/2026/tree/main/Vez/Libraries/AssetLoggers/Crimson/Assets"
+local URL = "https://raw.githubusercontent.com/Vezise/2026/main/Vez/Libraries/AssetLoggers/Crimson/Assets"
 local AssetData
 
 if not isfolder("Crimson") then
@@ -19,13 +19,25 @@ if not isfolder("Crimson/Assets") then
 	makefolder("Crimson/Assets")
 end
 
-for _, Asset in Assets do
-	if not isfile(`Crimson/Assets/{Asset}`) then
-		AssetData = game:HttpGet(`{URL}/{Asset}`)
-		writefile(`Crimson/Assets/{Asset}`, AssetData)
-	end
+local function RequestAsset(Asset)
+	local Request = request({
+        Url = `Url/{Asset}`,
+        Method = "GET",
+    })
+
+	return Request
 end
 
+for _, Asset in Assets do
+	if not isfile(`Crimson/Assets/{Asset}`) then
+		AssetData = RequestAsset(Asset)
+
+		if AssetData.StatusCode == 200 then
+			writefile(`Crimson/Assets/{Asset}`, AssetData.Body)
+		end
+	end
+end
+	
 -- parser
 
 local CollectionService = game:GetService("CollectionService")
