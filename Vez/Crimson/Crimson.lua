@@ -567,14 +567,16 @@ end)
 Services.CoreGui.AnimLoggerUI.Background.contain.bottom.contain["Play Animation"].BackgroundTransparency = 0
 Services.CoreGui.AnimLoggerUI.Background.little.contain.ViewportFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
 
-do
-	if getgenv().getcustomasset ~= nil then return end
-	local Notification = Library:createBigButtonNoti("WARNING!", "Your exploit does not support 'getcustomasset', this UI may be detected in some games.", Logger:GetAsset("Warning"), 10)
+task.spawn(function()
+	do
+		if getgenv().getcustomasset ~= nil then return end
+		local Notification = Library:createBigButtonNoti("WARNING!", "Your exploit does not support 'getcustomasset', this UI may be detected in some games.", Logger:GetAsset("Warning"), 10)
 
-	Notification:createButton("OK", function()
-		Notification:Close()
-	end)
-end
+		Notification:createButton("OK", function()
+			Notification:Close()
+		end)
+	end
+end)
 
 do
 	Handle(function()
