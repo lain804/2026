@@ -1,4 +1,3 @@
---// Asset loader (Crimson) -----------------------------------------------------
 local Assets = {
 	"108453875048733.png";
 	"82686076130111.png";
@@ -26,7 +25,8 @@ for _, Asset in Assets do
 		writefile(`Crimson/Assets/{Asset}`, AssetData)
 	end
 end
---//----------------------------------------------------------------------------
+
+-- parser
 
 local CollectionService = game:GetService("CollectionService")
 
