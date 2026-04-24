@@ -10,6 +10,8 @@ Execute this script in your executor:
 
 ```lua
 -------------// SETTINGS \\-------------
+getgenv().SafeMode = true
+-- Anti-Detection kick (if applicable)
 getgenv().AutoClearLogsDelay = 99999
 -- How many seconds to wait before logs are automatically cleared
 getgenv().BlockedAnimations = {"Animation1", "Animation2", "RunAnim", "WalkAnim"}
