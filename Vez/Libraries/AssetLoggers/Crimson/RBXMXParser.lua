@@ -42,8 +42,7 @@ for _, Asset in Assets do
 end
 	
 -- parser
-
-local CollectionService = game:GetService("CollectionService")
+local CollectionService = cloneref and cloneref(game:GetService("CollectionService")) or game:GetService("CollectionService")
 
 local RBXMXParser = {}
 
