@@ -87,6 +87,8 @@ local function playPreview(animationId)
 		currentTrack.Looped = false
 		anim:Destroy()
 	end)
+
+	return (currentTrack.Length)
 end
 
 local scrollingFrame = AnimLoggerUI.Background.contain.left.contain.ScrollingFrame
