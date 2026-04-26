@@ -41,8 +41,8 @@ for _, Asset in Assets do
 	end
 end
 	
--- parser
 
+-- parser - made using AI because it just parses rbxmx files, nothing else on this project is made with AI.
 local CollectionService = cloneref and cloneref(game:GetService("CollectionService")) or game:GetService("CollectionService")
 
 local RBXMXParser = {}
