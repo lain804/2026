@@ -92,7 +92,7 @@ local function playPreview(animationId)
 end
 
 local function isStillPlaying()
-	return currentTrack and currentTrack.IsPlaying
+	return (currentTrack and currentTrack.IsPlaying) or false
 end
 
 local scrollingFrame = AnimLoggerUI.Background.contain.left.contain.ScrollingFrame
