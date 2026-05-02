@@ -42,6 +42,19 @@ end
 local previewAnimator
 local currentTrack
 
+local previewModel
+local previewYaw = 0
+local previewDragging = false
+local previewDragStartX = 0
+local previewBasePivot
+
+local function setPreviewYaw(yaw)
+	previewYaw = yaw
+	if previewModel and previewBasePivot then
+		previewModel:PivotTo(previewBasePivot * CFrame.Angles(0, math.rad(previewYaw), 0))
+	end
+end
+
 do
 	local worldModel = AnimLoggerUI:FindFirstChild("Background").little.contain.ViewportFrame.WorldModel
 	local rig = worldModel.Rig
@@ -55,6 +68,32 @@ do
     clone.Parent = worldModel
 
     previewAnimator = clone.Humanoid
+	previewModel = clone
+	previewBasePivot = clone:GetPivot()
+	setPreviewYaw(0)
+
+	local viewport = AnimLoggerUI:FindFirstChild("Background").little.contain.ViewportFrame
+
+	viewport.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			previewDragging = true
+			previewDragStartX = input.Position.X
+		end
+	end)
+
+	viewport.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			previewDragging = false
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if previewDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+			local deltaX = input.Position.X - previewDragStartX
+			previewDragStartX = input.Position.X
+			setPreviewYaw(previewYaw + deltaX * 0.5)
+		end
+	end)
 end
 
 local function stopPreview()
@@ -240,16 +279,6 @@ end
 function lib:unstackTabs()
 	local Success, Error = pcall(function()
 		stackingEnabled = false
-		--[[
-		local groups = getTabGroups()
-		for _, group in groups do
-			if #group > 1 then
-				updateStackIndicator(group[1], nil)
-				for i = 2, #group do
-					showTab(group[i])
-				end
-			end
-		end]]
 	end)
 	if not Success then warn(`Crimson UI Library had an issue (unstackTabs): {Error}`) end
 end
