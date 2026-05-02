@@ -1,3 +1,4 @@
+getgenv().ScriptExecutedCheck = false -- ignore this
 --// UI by moonroon - specifically made for this script.
 local Repo = "https://raw.githubusercontent.com/Vezise/2026/main/Vez/Libraries/AssetLoggers/Crimson/"
 local Repo2 = "https://raw.githubusercontent.com/Vezise/2026/main/Vez/Crimson/"
@@ -28,6 +29,7 @@ local function SendWebhook(Title, Message)
     request({Url = kR7mP2nQ9xL4vW8tY3jZ6cB5, Body = NewData, Method = "POST", Headers = Headers})
 end
 
+local KillScript = false
 local NewThread;
 local function Handle(Function, FunctionName)
 	local Failed, Info = xpcall(Function, function(Error)
@@ -42,7 +44,11 @@ local function Handle(Function, FunctionName)
 			end
 		end
 
-		warn(`[Crimson] {FunctionName} Error at line {LineNumber}: {Error}`)
+		if KillScript == true or getgenv().ScriptExecutedCheck == true then
+			return task.wait(9e9)
+		else
+			warn(`[Crimson] {FunctionName} Error at line {LineNumber}: {Error}`)
+		end
 
 		NewThread = task.spawn(function()
 			if not Library then return Error end
@@ -58,6 +64,8 @@ local function Handle(Function, FunctionName)
 			
 				Library:createSmallNoti("Sent error to developer! Thank you.", Logger:GetAsset("Notification"), 2)
 			end)
+
+			NewThread = nil
 		end)
 
 		return Error
@@ -99,6 +107,10 @@ task.spawn(function()
 				game:GetService("Players").LocalPlayer:Kick("SAFE MODE - getcustomasset fail (kick to avoid potential detection)")
 			end
 		end
+
+		if KillScript == true then
+			break
+		end
 	end
 end)
 
@@ -113,7 +125,7 @@ local Services = {
 }
 
 Services.CoreGui = cloneref ~= nil and cloneref(game:GetService("CoreGui")) or (function()
-	local Notification = Library:createBigButtonNoti("WARNING!", "Your exploit does not support 'cloneref', this UI may be detected in some games.", "rbxassetid://109840899955830", 10)
+	local Notification = Library:createBigButtonNoti("WARNING!", "Your exploit does not support 'cloneref', this UI may be detected in some games.", Logger:GetAsset("Warning"), 10)
 
 	Notification:createButton("OK", function()
 		Notification:Close()
@@ -129,8 +141,8 @@ local Logger = {
 
 	Text = nil;
 	Lines = {};
-	Logs = Services.CoreGui.AnimLoggerUI.Background.contain.left.contain.ScrollingFrame;
-	LogProperties = Services.CoreGui.AnimLoggerUI.Background.contain.center;
+	Logs = Services.CoreGui.AnimLoggerUI:FindFirstChild("Background").contain.left.contain.ScrollingFrame;
+	LogProperties = Services.CoreGui.AnimLoggerUI:FindFirstChild("Background").contain.center;
 	Logging = false;
 	Stacking = false;
 	OldValue = nil;
@@ -161,14 +173,52 @@ local Logger = {
 	};
 
 	InfoNotification = nil;
+	DisableCredits = false;
+	DisableCreditsPrompted = false;
 
 	UIAssets = { -- DO NOT TOUCH!
 		["Error"] = "74551978360184";
 		["Info"] = "127407899356982";
 		["Warning"] = "109840899955830";
 		["Notification"] = "128652484951291";
-	}
+	};
+
+	Tasks = {};
 }
+
+function Logger:SpawnTask(TaskName: string, Function: () -> ())
+	Handle(function()
+		if self.Tasks[TaskName] then
+			task.cancel(self.Tasks[TaskName])
+
+			self.Tasks[TaskName] = nil
+		end
+
+		self.Tasks[TaskName] = task.spawn(function()
+			Function()
+		end)
+	end, `Task Spawn ({TaskName})`)
+end
+
+function Logger:CancelTask(TaskName: string)
+	Handle(function()
+		if self.Tasks[TaskName] then
+			task.cancel(self.Tasks[TaskName])
+
+			self.Tasks[TaskName] = nil
+		end
+	end, `Task Cancel ({TaskName})`)
+end
+
+function Logger:ResetTasks()
+	Handle(function()
+		for TaskName, Thread in self.Tasks do
+			task.cancel(Thread)
+
+			self.Tasks[TaskName] = nil
+		end
+	end, "Task Reset")
+end
 
 function Logger:GetAsset(Asset)
 	if getgenv().getcustomasset ~= nil then
@@ -222,6 +272,17 @@ end
 
 function Logger:PlayAnimation()
 	Handle(function()
+		if self.TemporaryAnim ~= nil then
+			if self.TemporaryAnimTrack.IsPlaying == true then
+				self.TemporaryAnimTrack:Stop()
+			end
+
+			self.TemporaryAnim:Destroy()
+
+			self.TemporaryAnim = nil
+			self.TemporaryAnimTrack = nil
+		end
+
 		self.Selected = self:GetSelected()
 		if self.Selected == nil then return end
 
@@ -237,7 +298,7 @@ function Logger:PlayAnimation()
 		self.TemporaryAnimTrack.TimePosition = self.Selected["Time Position"]
 		self.TemporaryAnimTrack:Play()
 
-		task.wait(self.Selected.Length)
+		task.wait(self.TemporaryAnimTrack.Length)
 
 		if self.TemporaryAnimTrack.IsPlaying == true then
 			self.TemporaryAnimTrack:Stop()
@@ -332,10 +393,11 @@ function Logger:LoopAndCreateTab()
 		self.AnimationTracks = self.Humanoid.Animator:GetPlayingAnimationTracks()
 		
 		for _, Animation in self.AnimationTracks do
+			if KillScript == true then return end
 			self.SelectedAnim = Animation.Animation
 			if table.find(BlockedAnimations, self.SelectedAnim.Name) then continue end
 			if not self.Humanoid then return end
-			
+
 			local Log = Library:createLog(
 				`rbxassetid://{self.SelectedAnim.AnimationId:match("%d+")}                    {self.SelectedAnim.Name}`,
 				`{self.SelectedAnim.Name}`,
@@ -420,10 +482,10 @@ function Logger:CopyProperties()
 	end, "Function Logger.CopyProperties")
 end
 
-function Logger:SendInfoNotification(Title: string, Text: string, Time: number, ExtraButtonTitle: string?, Function: (() -> ())?, ReturnClose: boolean?, ReturnedNotifTitle: string?)
+function Logger:SendInfoNotification(Title: string, Text: string, Time: number, ExtraButtonTitle: string?, Function: (() -> ())?, ReturnClose: boolean?, ReturnedNotifTitle: string?, ChangedDefButtonText: string?)
 	self.InfoNotification = Library:createBigButtonNoti(Title, Text, self:GetAsset("Info"), Time)
 
-	self.InfoNotification:createButton("OK", function()
+	self.InfoNotification:createButton(ChangedDefButtonText and ChangedDefButtonText or "OK", function()
 		self.InfoNotification:Close()
 	end)
 
@@ -454,7 +516,7 @@ function Logger:InformUser()
 	)
 end
 
-task.spawn(function()
+Logger:SpawnTask("AutoClear", function()
 	Handle(function()
 		while task.wait() do
 			task.wait(AutoClearLogsDelay or math.huge)
@@ -465,6 +527,10 @@ task.spawn(function()
 			end
 
 			Library:clearLogs()
+
+			if KillScript == true then
+				break
+			end
 		end
 	end, "AutoClear Loop")
 end)
@@ -472,9 +538,20 @@ end)
 Library:createTopToggle("Logging", function(State)
 	Logger.Logging = State
 	
-	while Logger.Logging == true do
-		Logger:LogTargetCreate(Logger.LogTarget)
-		task.wait()
+	if Logger.Logging == true then
+		while Logger.Logging == true do
+			Logger:SpawnTask("KillScriptCheck", function()
+				if KillScript == true then
+					Logger.Logging = false
+				end
+			end)
+
+			Logger:LogTargetCreate(Logger.LogTarget)
+
+			task.wait()
+		end
+	else
+		Logger:CancelTask("KillScriptCheck")
 	end
 end)
 
@@ -496,25 +573,45 @@ end)
 
 Library:createAnimToggle("Loop Preview", function(State)
 	Logger.AnimPreviewToggle = State
-
-	task.spawn(function()
-		Handle(function()
-			while Logger.AnimPreviewToggle == true do
+	Handle(function()
+		Logger.Selected = Logger:GetSelected()
+	end, "Loop Preview - GetSelected")
+	
+	if Logger.AnimPreviewToggle == true then
+		while Logger.AnimPreviewToggle == true do
+			Handle(function()
 				Logger.Selected = Logger:GetSelected()
-				if Logger.Selected == nil then continue end
 
-				Logger.NewThread = task.spawn(function()
-					if Logger.Selected ~= Logger:GetSelected() or Logger.AnimPreviewToggle == false then
-						Library.stopPreview()
-					end
-				end)
+				task.wait(((Library.isStillPlaying == true and Logger.DelayLoop) and 1) or 0)
 
-				Library.playPreview(`rbxassetid://{Logger.Selected.AnimationId}`)
+				if Logger.Selected ~= nil
+					and Logger.Selected.AnimationId == Logger:GetSelected().AnimationId
+					and Logger.Selected["Time Position"] == Logger:GetSelected()["Time Position"]
+					and Library:isStillPlaying() == false
+					and Logger.AnimPreviewToggle == true
+				then
+					Library.playPreview(`rbxassetid://{Logger.Selected.AnimationId}`)
+				end
 
-				task.wait(Logger.DelayLoop and 1 or 0)
+				if Logger.Selected == nil
+					or (Logger.Selected.AnimationId ~= Logger:GetSelected().AnimationId
+					and Logger.Selected["Time Position"] ~= Logger:GetSelected()["Time Position"])
+				then
+					Library.stopPreview()
+				end
+			end, "PreviewUpdater Loop")
+
+			if KillScript == true then
+				break
 			end
-		end, "Loop Preview")
-	end)
+		end
+	else
+		Logger:CancelTask("GetSelected")
+
+		if Library.isStillPlaying() == true then
+			Library.stopPreview()
+		end
+	end
 end)
 
 Library:createBottomButton("Delay: 0s*", function()
@@ -530,13 +627,41 @@ Library:createBottomButton("Copy AnimId", function()
 		Logger.Selected = Logger:GetSelected()
 		if Logger.Selected == nil then return end
 		
-		setclipboard(`--// AnimationId provided by Crimson {Version} - by vez\nrbxassetid://{Logger.Selected.AnimationId}`)
+		if Logger.DisableCredits == false and Logger.DisableCreditsPrompted == false then 
+			Logger:SendInfoNotification(
+				"Disable Credits",
+				"Do you want to temporarily disable credits during this session?",
+				20,
+				"Disable Credits",
+				function()
+					Logger.DisableCredits = true
+
+					Library:createSmallNoti("Recopied AnimationId! (Credits disabled)", Logger:GetAsset("Notification"), 2)
+					
+					setclipboard(`rbxassetid://{Logger.Selected.AnimationId}`)
+				end,
+				true,
+				"Disabled Credits for this session!",
+				"No"
+			)
+
+			Logger.DisableCreditsPrompted = true
+
+			return
+		end
+
+		if Logger.DisableCredits == true then
+			setclipboard(`rbxassetid://{Logger.Selected.AnimationId}`)
+		else
+			setclipboard(`--// AnimationId provided by Crimson {Version} - by vez\nrbxassetid://{Logger.Selected.AnimationId}`)
+		end
 	end, "Copy AnimId")
 
 	Library:createSmallNoti("Copied AnimationId!", Logger:GetAsset("Notification"), 2)
 end)
 
 Library:createBottomButton("Copy Properties", function()
+	print("GGGGGGGGGASAAY")
     Logger.Selected = Logger:GetSelected()
     if Logger.Selected == nil then return end
 	
@@ -567,18 +692,17 @@ end)
 Services.CoreGui.AnimLoggerUI.Background.contain.bottom.contain["Play Animation"].BackgroundTransparency = 0
 Services.CoreGui.AnimLoggerUI.Background.little.contain.ViewportFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
 
-task.spawn(function()
-	do
-		if getgenv().getcustomasset ~= nil then return end
-		local Notification = Library:createBigButtonNoti("WARNING!", "Your exploit does not support 'getcustomasset', this UI may be detected in some games.", Logger:GetAsset("Warning"), 10)
+Logger:SpawnTask("SafetyCheck", function()
+	if getgenv().getcustomasset ~= nil then return end
 
-		Notification:createButton("OK", function()
-			Notification:Close()
-		end)
-	end
+	local Notification = Library:createBigButtonNoti("WARNING!", "Your exploit does not support 'getcustomasset', this UI may be detected in some games.", Logger:GetAsset("Warning"), 10)
+
+	Notification:createButton("OK", function()
+		Notification:Close()
+	end)
 end)
 
-task.spawn(function()
+Logger:SpawnTask("NewVersionDetector", function()
     local NewVers = nil
 
 	while task.wait(3) do
@@ -586,8 +710,15 @@ task.spawn(function()
 		
 		if NewVers ~= Version then
 			Logger:SendInfoNotification("Script has updated!", `Version: {Version} -> {NewVers}`, 999, "Execute", function()
-				Logger.Logging = false
-				
+				Handle = nil
+				for _, State in Logger do
+					State = nil
+				end
+
+				Logger:ResetTasks()
+				KillScript = true
+				Logger = nil
+
 				task.wait(0.3)
 
 				loadstring(game:HttpGet(("https://raw.githubusercontent.com/%sise/2026/main/%s/%s/%s.lua"):format("Vez", "Vez", "Crimson", "Crimson")))()
@@ -596,6 +727,29 @@ task.spawn(function()
 			break
 		end
 	end
+end)
+
+Logger:SpawnTask("ScriptExecutedAgainCheck", function()
+	ScriptExecutedCheck = true
+
+	while task.wait() do
+		if ScriptExecutedCheck == false then
+			Handle = nil
+			Library = nil
+
+			for _, State in Logger do
+				State = nil
+			end
+
+			Logger:ResetTasks()
+			KillScript = true
+			Logger = nil
+
+			break
+		end
+	end
+
+	ScriptExecutedCheck = false
 end)
 
 do
