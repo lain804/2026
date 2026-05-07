@@ -1,5 +1,180 @@
 getgenv().VexExecutedCheck = false
 
+local RiskyServices = {
+    "TelemetryService";
+    "BrowserService";
+    "CommerceService";
+    "HSRDataContentProvider";
+    "StylingService";
+    "ControllerService";
+    "AvatarEditorService";
+    "GenericChallengeService";
+    "CSGDictionaryService";
+    "EditableService";
+    "AchievementService";
+    "CollectionService";
+    "ScriptRegistrationService";
+    "AdService";
+    "InsertService";
+    "StudioData";
+    "RobloxReplicatedStorage";
+    "LogService";
+    "SolidModelContentProvider";
+    "ExperienceNotificationService";
+    "Visit";
+    "SoundService";
+    "ScriptService";
+    "ChangeHistoryService";
+    "RuntimeContentService";
+    "HapticService";
+    "MaterialService";
+    "ContentProvider";
+    "IXPService";
+    "UserService";
+    "NonReplicatedCSGDictionaryService";
+    "EncodingService";
+    "TextService";
+    "Stats";
+    "NetworkClient";
+    "TweenService";
+    "PlatformLibraries";
+    "GuidRegistryService";
+    "PlayerHydrationService";
+    "KeyframeSequenceProvider";
+    "HttpRbxApiService";
+    "CorePackages";
+    "GuiService";
+    "Teleport Service";
+    "TextBoxService";
+    "CookiesService";
+    "VRService";
+    "FaceAnimatorService";
+    "CreatorStoreService";
+    "PhysicsService";
+    "AvatarSettings";
+    "LocalizationTable";
+    "RuntimeScriptService";
+    "HttpService";
+    "ThirdPartyUserService";
+    "PlatformFriendsService";
+    "UIDragDetectorService";
+    "HeapProfilerService";
+    "FilteredSelection";
+    "FacialAgeEstimationService";
+    "PlatformCloudStorageService";
+    "SessionService";
+    "CaptureService";
+    "ModerationService";
+    "ExperienceService";
+    "AuroraService";
+    "RtMessagingService";
+    "PolicyService";
+    "GroupService";
+    "SpawnerService";
+    "RbxAnalyticsService";
+    "Chat";
+    "AudioFocusService";
+    "Selection";
+    "VoiceChatService";
+    "SlimContentProvider";
+    "ExperienceAuthService";
+    "GamepadService";
+    "TouchInputService";
+    "Run Service";
+    "SharedTableRegistry";
+    "Script Context";
+    "AvatarCreationService";
+    "FriendService";
+    "ScriptProfilerService";
+    "AppLifecycleObserverService";
+    "SafetyService";
+    "SocialService";
+    "AssetService";
+    "AvatarChatService";
+    "AnimationClipProvider";
+    "TemporaryCageMeshProvider";
+    "LinkingService";
+    "PlayerEmulatorService";
+    "MemStorageService";
+    "RobloxServerStorage";
+    "TestService";
+    "ProximityPromptService";
+    "VideoService";
+    "MessageBusService";
+    "TextChatService";
+    "BadgeService";
+    "ExperienceStateCaptureService";
+    "EventIngestService";
+    "WebViewService";
+    "PermissionsService";
+    "MarketplaceService";
+    "MeshContentProvider";
+    "TimerService";
+    "AppStorageService";
+    "UserInputService";
+    "NetworkServer";
+    "MouseService";
+    "LocalizationService";
+    "RecommendationService";
+    "AnalyticsService";
+    "Instance";
+    "KeyboardService";
+    "JointsService";
+    "HeatmapService";
+    "NotificationService";
+    "MicroProfilerService";
+    "VideoCaptureService";
+    "ContextActionService";
+    "PointsService";
+    "FeatureRestrictionManager";
+    "GamePassService";
+    "GenerationService";
+}
+
+local cloneref = (function()
+    local Native = cloneref
+    if not Native then
+        return function(Object)
+            return Object
+        end
+    end
+
+    local Cache = setmetatable({}, {__mode = "v"})
+
+    return function(Object)
+        if not Object then
+            return nil
+        end
+
+        local Id = Object:GetDebugId()
+        local Cached = Cache[Id]
+        if Cached then
+            return Cached
+        end
+
+        local Cloned = Native(Object)
+        Cache[Id] = Cloned
+
+        return Cloned
+    end
+end)()
+
+local function GetService(Name)
+    return cloneref(game:GetService(Name))
+end
+
+local Services = {
+    Players = GetService("Players");
+    UserInputService = GetService("UserInputService");
+    TweenService = GetService("TweenService");
+    RunService = GetService("RunService");
+    HttpService = GetService("HttpService");
+    CoreGui = GetService("CoreGui");
+    TeleportService = GetService("TeleportService");
+    CollectionService = game:GetService("CollectionService");
+    GuiService = GetService("GuiService");
+}
+
 task.wait(0.2)
 
 do
@@ -8,7 +183,7 @@ do
     if Good and GuiHolder then
         table.insert(Hosts, GuiHolder)
     end
-    table.insert(Hosts, game:GetService("CoreGui"))
+    table.insert(Hosts, Services.CoreGui)
 
     for _, Host in Hosts do
         for _, Child in Host:GetChildren() do
@@ -21,17 +196,50 @@ do
     end
 end
 
-local Services = {
-    Players = (cloneref or function(Object) return Object end)(game:GetService("Players"));
-    UserInputService = (cloneref or function(Object) return Object end)(game:GetService("UserInputService"));
-    TweenService = (cloneref or function(Object) return Object end)(game:GetService("TweenService"));
-    RunService = (cloneref or function(Object) return Object end)(game:GetService("RunService"));
-    HttpService = (cloneref or function(Object) return Object end)(game:GetService("HttpService"));
-    CoreGui = (cloneref or function(Object) return Object end)(game:GetService("CoreGui"));
-    TeleportService = (cloneref or function(Object) return Object end)(game:GetService("TeleportService"));
-    CollectionService = (cloneref or function(Object) return Object end)(game:GetService("CollectionService"));
-    GuiService = (cloneref or function(Object) return Object end)(game:GetService("GuiService"));
-}
+local LocalPlayer = cloneref(Services.Players.LocalPlayer)
+local RawGetChildren = game.GetChildren
+local RawGetDescendants = game.GetDescendants
+
+local function ClonerefInstance(Object)
+    if cloneref then
+        local Good, Cloned = pcall(cloneref, Object)
+        if Good then
+            return Cloned
+        end
+    end
+
+    return Object
+end
+
+local function WeakGetChildren(Object)
+    local Good, Raw = pcall(RawGetChildren, Object)
+    if not Good or type(Raw) ~= "table" then
+        return setmetatable({}, {__mode = "v"})
+    end
+
+    setmetatable(Raw, {__mode = "v"})
+    local Out = {}
+    for Index = 1, #Raw do
+        Out[Index] = ClonerefInstance(Raw[Index])
+    end
+
+    return Out
+end
+
+local function WeakGetDescendants(Object)
+    local Good, Raw = pcall(RawGetDescendants, Object)
+    if not Good or type(Raw) ~= "table" then
+        return setmetatable({}, {__mode = "v"})
+    end
+
+    setmetatable(Raw, {__mode = "v"})
+    local Out = {}
+    for Index = 1, #Raw do
+        Out[Index] = ClonerefInstance(Raw[Index])
+    end
+
+    return Out
+end
 
 local KillScript = false
 local Connections = {}
@@ -170,7 +378,58 @@ local function Handle(Callback, FunctionName)
 end
 
 local CachedDecompile = decompile
-loadstring(game:HttpGet("https://lua.expert/script.lua"))()
+local last = 0
+getgenv().decompile = function(scr) -- lua.expert
+    local ok, bytecode = pcall(getscriptbytecode, scr)
+    if not ok then
+        return "-- failed to read script bytecode\n--[[\n" .. tostring(bytecode) .. "\n--]]"
+    end
+
+    local elapsed = os.clock() - last
+    if elapsed < 0.12 then
+        task.wait(0.12 - elapsed)
+    end
+
+    local encoder = base64_encode
+    if not encoder then
+        encoder = function(data)
+            local b = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+            return ((data:gsub('.', function(x)
+                local r,byte = '',x:byte()
+                for i=8,1,-1 do
+                    r = r .. (byte % 2^i - byte % 2^(i-1) > 0 and '1' or '0')
+                end
+                return r
+            end)..'0000'):gsub('%d%d%d?%d?%d?%d?', function(x)
+                if #x < 6 then return '' end
+                local c = 0
+                for i=1,6 do
+                    c = c + (x:sub(i,i) == '1' and 2^(6-i) or 0)
+                end
+                return b:sub(c+1,c+1)
+            end)..({ '', '==', '=' })[#data % 3 + 1])
+        end
+    end
+
+    local res = request({
+        Url = "https://api.lua.expert/decompile",
+        Method = "POST",
+        Headers = {
+            ["content-type"] = "application/json"
+        },
+        Body = Services.HttpService:JSONEncode({
+            script = encoder(bytecode)
+        })
+    })
+
+    last = os.clock()
+
+    if not res or res.StatusCode ~= 200 then
+        return "-- api request error\n--[[\n" .. (res and res.Body or "no response") .. "\n--]]"
+    end
+
+    return res.Body
+end
 local AssetBaseURL = "https://raw.githubusercontent.com/Vezise/2026/main/Vez/Libraries/VexExplorer/Assets"
 local AssetFolder = "Vex"
 local AssetsSubFolder = "Vex/Assets"
@@ -440,9 +699,15 @@ end
 PrefetchAssets()
 
 local PinnedServices = {
-    "Workspace"; "Players"; "Lighting"; "ReplicatedFirst";
-    "ReplicatedStorage"; "StarterPlayer"; "StarterPack";
-    "StarterGui"; "CoreGui";
+    "Workspace";
+    "Players";
+    "Lighting";
+    "ReplicatedFirst";
+    "ReplicatedStorage";
+    "StarterPlayer";
+    "StarterPack";
+    "StarterGui";
+    "CoreGui";
 }
 
 local PinnedRank = {}
@@ -645,6 +910,7 @@ local PropertyGroups = {
     {
         Class = "Player";
         Properties = {
+            "Character";
             "UserId";
             "DisplayName";
             "Team";
@@ -1629,6 +1895,34 @@ local PropertyGroups = {
             "Offset";
         };
     };
+
+    {
+        Class = "LuaSourceContainer";
+        Properties = {
+            "Source";
+            "LinkedSource";
+        };
+    };
+
+    {
+        Class = "Script";
+        Properties = {
+            "Disabled";
+            "RunContext";
+        };
+    };
+
+    {
+        Class = "LocalScript";
+        Properties = {
+            "Disabled";
+        };
+    };
+
+    {
+        Class = "ModuleScript";
+        Properties = {};
+    };
 }
 
 local function CollectProperties(Object)
@@ -1656,6 +1950,43 @@ local function CollectProperties(Object)
     end
 
     return Ordered
+end
+
+local function CollectAttributes(Object)
+    local Items = {}
+    local Good, Map = pcall(function()
+        return Object:GetAttributes()
+    end)
+
+    if not Good or type(Map) ~= "table" then
+        return Items
+    end
+
+    for Name, Value in Map do
+        table.insert(Items, {Name = Name; Value = Value})
+    end
+
+    table.sort(Items, function(Left, Right)
+        return Left.Name:lower() < Right.Name:lower()
+    end)
+
+    return Items
+end
+
+local function CollectTags(Object)
+    local Good, Tags = pcall(function()
+        return Services.CollectionService:GetTags(Object)
+    end)
+
+    if not Good or type(Tags) ~= "table" then
+        return {}
+    end
+
+    table.sort(Tags, function(Left, Right)
+        return tostring(Left):lower() < tostring(Right):lower()
+    end)
+
+    return Tags
 end
 
 local MethodGroups = {
@@ -3092,8 +3423,48 @@ function VexUI:CreateTooltip(Parent, Text)
     return Tooltip
 end
 
+local function IsLuaIdentifier(Name)
+    if type(Name) ~= "string" or #Name == 0 then
+        return false
+    end
+
+    if Name:match("^[%a_][%w_]*$") == nil then
+        return false
+    end
+
+    local Reserved = {
+        ["and"] = true; ["break"] = true; ["do"] = true; ["else"] = true;
+        ["elseif"] = true; ["end"] = true; ["false"] = true; ["for"] = true;
+        ["function"] = true; ["goto"] = true; ["if"] = true; ["in"] = true;
+        ["local"] = true; ["nil"] = true; ["not"] = true; ["or"] = true;
+        ["repeat"] = true; ["return"] = true; ["then"] = true; ["true"] = true;
+        ["until"] = true; ["while"] = true; ["continue"] = true;
+    }
+
+    return not Reserved[Name]
+end
+
+local function FormatSegment(Name, IsRoot)
+    if IsLuaIdentifier(Name) then
+        return IsRoot and Name or `.{Name}`
+    end
+
+    if not Name:find('"') and not Name:find("\\") and not Name:find("\n") and not Name:find("\r") then
+        return `["{Name}"]`
+    end
+
+    local Level = 0
+    while Name:find(`]{string.rep("=", Level)}]`, 1, true) do
+        Level += 1
+    end
+
+    --local Eq = string.rep("=", Level)
+    --return `{Eq}[{"`"}{Name}{"`"}]{Eq}`
+    return `[{"`"}{Name}{"`"}]`
+end
+
 Explorer = {
-    LocalPlayer = Services.Players.LocalPlayer;
+    LocalPlayer = LocalPlayer;
     ScreenGui = nil;
     ExplorerWindow = nil;
     PropertiesWindow = nil;
@@ -3211,6 +3582,9 @@ Explorer = {
     SubtreeMatchSet = {};
 
     _FilterRowRefreshers = {};
+
+    PropertyFilters = {};
+    PropertyFilterTemplate = nil;
 }
 
 function Explorer:SpawnTask(TaskName, Callback)
@@ -3231,17 +3605,163 @@ function Explorer:ResetTasks()
     end
 end
 
-function Explorer:FullPath(Object)
-    local Parts = {}
-    local Current = Object
-    while Current and Current ~= game do
-        table.insert(Parts, 1, Current.Name)
-        Current = Current.Parent
+function Explorer:GetInstancePath(Object)
+    if not Object or typeof(Object) ~= "Instance" then
+        return ""
     end
 
-    table.insert(Parts, 1, "game")
+    local LocalPlayerRef = self.LocalPlayer or Services.Players.LocalPlayer
 
-    return table.concat(Parts, ".")
+    local function IsGame(Inst)
+        return Inst == game
+    end
+
+    local function IsWorkspace(Inst)
+        if Inst == workspace then
+            return true
+        end
+
+        local Good, Match = pcall(function()
+            return Inst:IsA("Workspace")
+        end)
+
+        return Good and Match == true
+    end
+
+    local function IsLocalPlayer(Inst)
+        if Inst == LocalPlayerRef then
+            return true
+        end
+
+        if not LocalPlayerRef then
+            return false
+        end
+
+        local Good, IsPlayer = pcall(function()
+            return Inst:IsA("Player")
+        end)
+
+        if not Good or not IsPlayer then
+            return false
+        end
+
+        local GoodId, UserId = pcall(function()
+            return Inst.UserId
+        end)
+
+        local GoodRefId, RefUserId = pcall(function()
+            return LocalPlayerRef.UserId
+        end)
+
+        if not GoodId or not GoodRefId then
+            return false
+        end
+
+        return UserId == RefUserId and UserId ~= 0
+    end
+
+    if IsGame(Object) then
+        return "game"
+    end
+
+    if IsWorkspace(Object) then
+        return "workspace"
+    end
+
+    if IsLocalPlayer(Object) then
+        return `game:GetService("Players").LocalPlayer`
+    end
+
+    local Segments = {}
+    local Cursor = Object
+    local Anchor
+
+    while Cursor and not IsGame(Cursor) do
+        if IsWorkspace(Cursor) then
+            Anchor = "workspace"
+
+            break
+        end
+
+        if IsLocalPlayer(Cursor) then
+            Anchor = `game:GetService("Players").LocalPlayer`
+
+            break
+        end
+
+        local GoodName, Name = pcall(function()
+            return Cursor.Name
+        end)
+
+        if not GoodName or type(Name) ~= "string" then
+            return ""
+        end
+
+        local GoodParent, Parent = pcall(function()
+            return Cursor.Parent
+        end)
+
+        if not GoodParent then
+            return ""
+        end
+
+        if Parent and IsGame(Parent) then
+            local GoodClass, ClassName = pcall(function()
+                return Cursor.ClassName
+            end)
+
+            if GoodClass and type(ClassName) == "string" then
+                local GoodService, Service = pcall(function()
+                    return game:GetService(ClassName)
+                end)
+
+                if GoodService and Service then
+                    local SameService = Service == Cursor
+                    if not SameService then
+                        local GoodSvcName, SvcName = pcall(function()
+                            return Service.Name
+                        end)
+
+                        SameService = GoodSvcName and SvcName == Name
+                    end
+
+                    if SameService then
+                        Anchor = `game:GetService("{ClassName}")`
+
+                        break
+                    end
+                end
+            end
+        end
+
+        table.insert(Segments, 1, Name)
+        Cursor = Parent
+    end
+
+    if not Anchor then
+        Anchor = "game"
+    end
+
+    local Path = Anchor
+    for _, Name in Segments do
+        Path ..= FormatSegment(Name, false)
+    end
+
+    return Path
+end
+
+function Explorer:FullPath()
+    local Target = self.SelectedInstance
+    if not Target then
+        return
+    end
+
+    local Path = self:GetInstancePath(Target)
+    if Path == "" then
+        return
+    end
+
+    return Path
 end
 
 function Explorer:FormatValue(Value)
@@ -3620,52 +4140,81 @@ function Explorer:CreateNodeRow(Node, RowParent)
         end)))
     end
 
-    local ChildAddedGood, ChildAddedConnection = pcall(function()
-        return Node.Instance.ChildAdded:Connect(function(Child)
-            if typeof(Child) ~= "Instance" then
-                return
-            end
+    Node._ConnectChildSignals = function()
+        if Node._ChildAddedConn then
+            return
+        end
 
-            self:UpdateArrow(Node)
-
-            if Node.Expanded then
-                if self.SearchQuery == ""
-                    or self.MatchSet[Child]
-                    or self.SubtreeMatchSet[Child]
-                then
-                    self:CreateChildNode(Node, Child)
+        local Good, Connection = pcall(function()
+            return Node.Instance.ChildAdded:Connect(function(RawChild)
+                if typeof(RawChild) ~= "Instance" then
+                    return
                 end
-            end
 
-            if self.SearchQuery ~= ""
-                and Child.Name:lower():find(self.SearchQuery, 1, true)
-            then
-                ScheduleSearchRefresh()
-            end
+                local Child = ClonerefInstance(RawChild)
+
+                self:UpdateArrow(Node)
+
+                if Node.Expanded then
+                    if self.SearchQuery == ""
+                        or self.MatchSet[Child]
+                        or self.SubtreeMatchSet[Child]
+                    then
+                        self:CreateChildNode(Node, Child)
+                    end
+                end
+
+                if self.SearchQuery ~= ""
+                    and Child.Name:lower():find(self.SearchQuery, 1, true)
+                then
+                    ScheduleSearchRefresh()
+                end
+            end)
         end)
-    end)
 
-    if ChildAddedGood and ChildAddedConnection then
-        table.insert(Node.Connections, Track(ChildAddedConnection))
+        if Good and Connection then
+            Node._ChildAddedConn = Connection
+            table.insert(Node.Connections, Track(Connection))
+        end
+        
+        local Good2, Connection2 = pcall(function()
+            return Node.Instance.ChildRemoved:Connect(function(RawChild)
+                if typeof(RawChild) ~= "Instance" then
+                    return
+                end
+
+                local Child = ClonerefInstance(RawChild)
+
+                self:UpdateArrow(Node)
+
+                local ChildNode = self.NodesByInstance[Child]
+                if ChildNode and ChildNode.Parent == Node then
+                    self:DestroyNode(ChildNode)
+                end
+            end)
+        end)
+
+        if Good2 and Connection2 then
+            Node._ChildRemovedConn = Connection2
+            table.insert(Node.Connections, Track(Connection2))
+        end
     end
 
-    local ChildRemovedGood, ChildRemovedConnection = pcall(function()
-        return Node.Instance.ChildRemoved:Connect(function(Child)
-            if typeof(Child) ~= "Instance" then
-                return
-            end
+    Node._DisconnectChildSignals = function()
+        if Node._ChildAddedConn then
+            pcall(function()
+                Node._ChildAddedConn:Disconnect()
+            end)
 
-            self:UpdateArrow(Node)
+            Node._ChildAddedConn = nil
+        end
+        if Node._ChildRemovedConn then
+            pcall(function()
+                Node._ChildRemovedConn:Disconnect()
+            end)
 
-            local ChildNode = self.NodesByInstance[Child]
-            if ChildNode and ChildNode.Parent == Node then
-                self:DestroyNode(ChildNode)
-            end
-        end)
-    end)
-
-    if ChildRemovedGood and ChildRemovedConnection then
-        table.insert(Node.Connections, Track(ChildRemovedConnection))
+            Node._ChildRemovedConn = nil
+        end
     end
 end
 
@@ -3687,7 +4236,7 @@ function Explorer:UpdateArrow(Node)
 
     if HasChildren then
         Node.Arrow.Text = Node.Expanded and "-" or "+"
-        Node.Arrow.TextSize = 10
+        Node.Arrow.TextSize = 14
         Node.Arrow.TextColor3 = Theme.TextDim
     else
         Node.Arrow.Text = ""
@@ -3810,19 +4359,17 @@ function Explorer:ExpandNode(Node)
     self:UpdateArrow(Node)
     Node.ChildContainer.Visible = true
 
+    if Node._ConnectChildSignals then
+        Node._ConnectChildSignals()
+    end
+
     if Node.IsNilContainer then
         self:MountNilVirtualList()
 
         return
     end
 
-    local Good, Children = pcall(function()
-        return Node.Instance:GetChildren()
-    end)
-
-    if not Good then
-        return
-    end
+    local Children = WeakGetChildren(Node.Instance)
 
     Node.PendingChildren = Node.PendingChildren or {}
     local Searching = self.SearchQuery ~= ""
@@ -3950,6 +4497,11 @@ function Explorer:CollapseNode(Node)
     Node.Expanded = false
     self:UpdateArrow(Node)
     Node.ChildContainer.Visible = false
+
+    if Node._DisconnectChildSignals then
+        Node._DisconnectChildSignals()
+    end
+
     Node.PendingChildren = nil
     if self.PendingNodesSet then
         self.PendingNodesSet[Node] = nil
@@ -3968,6 +4520,115 @@ function Explorer:ToggleNode(Node)
     else
         self:ExpandNode(Node)
     end
+end
+
+function Explorer:JumpToCharacter(Player)
+    if not Player then
+        return
+    end
+
+    local Good, Character = pcall(function()
+        return Player.Character
+    end)
+
+    if not Good or not Character then
+        if self.ShowErrorNotification then
+            pcall(function()
+                self:ShowErrorNotification(`{Player.Name} has no Character`)
+            end)
+        end
+
+        return
+    end
+
+    Character = ClonerefInstance(Character)
+
+    self.SearchQuery = ""
+    if self.SearchBox then
+        self.SearchBox.Text = ""
+    end
+    self:RefreshAllSearchFilters()
+
+    local Chain = {}
+    local Cursor = ClonerefInstance(Character)
+    while Cursor and Cursor.Parent ~= nil do
+        table.insert(Chain, 1, Cursor)
+        Cursor = ClonerefInstance(Cursor.Parent)
+    end
+
+    if #Chain == 0 then
+        return
+    end
+
+    local PreviousNode
+    for Index, Ancestor in Chain do
+        local IsLeaf = Index == #Chain
+        local Node = self.NodesByInstance[Ancestor]
+
+        if not Node and PreviousNode then
+            if not PreviousNode.Expanded then
+                self:ExpandNode(PreviousNode)
+            end
+
+            if PreviousNode.PendingChildren then
+                for I, Pending in PreviousNode.PendingChildren do
+                    if Pending == Ancestor then
+                        table.remove(PreviousNode.PendingChildren, I)
+
+                        break
+                    end
+                end
+
+                if #PreviousNode.PendingChildren == 0 then
+                    PreviousNode.PendingChildren = nil
+                    if self.PendingNodesSet then
+                        self.PendingNodesSet[PreviousNode] = nil
+                    end
+                end
+            end
+
+            Node = self:CreateChildNode(PreviousNode, Ancestor)
+        end
+
+        if not Node then
+            return
+        end
+
+        if not IsLeaf and not Node.Expanded then
+            self:ExpandNode(Node)
+        end
+
+        PreviousNode = Node
+    end
+
+    self:SetSelection({Character})
+    self.SelectionAnchor = Character
+
+    local Scroll = self.ExplorerColumn and self.ExplorerColumn.Content
+    if not Scroll or not Scroll:IsA("ScrollingFrame") then
+        return
+    end
+
+    task.defer(function()
+        if KillScript then
+            return
+        end
+
+        for _ = 1, 30 do
+            task.wait()
+
+            local Node = self.NodesByInstance[Character]
+            if Node and Node.Row and Node.Row.Parent and Node.Row.AbsoluteSize.Y > 0 then
+                local RowAbsY = Node.Row.AbsolutePosition.Y
+                local FrameAbsY = Scroll.AbsolutePosition.Y
+                local Offset = (RowAbsY - FrameAbsY) + Scroll.CanvasPosition.Y
+                local TargetY = math.max(0, Offset - Scroll.AbsoluteSize.Y / 2 + 11)
+                Scroll.CanvasPosition = Vector2.new(Scroll.CanvasPosition.X, TargetY)
+
+                return
+            end
+        end
+    end)
 end
 
 function Explorer:EnsureNodeVisible(Object)
@@ -4024,7 +4685,7 @@ function Explorer:ComputeOrderForService(Object)
     end
 
     local Unpinned = {}
-    for _, Child in game:GetChildren() do
+    for _, Child in WeakGetChildren(game) do
         if not PinnedRank[Child.Name] then
             table.insert(Unpinned, Child)
         end
@@ -4046,7 +4707,7 @@ end
 function Explorer:ToggleAllServicesHidden()
     self.AllServicesHidden = not self.AllServicesHidden
     if self.AllServicesHidden then
-        for _, Service in game:GetChildren() do
+        for _, Service in WeakGetChildren(game) do
             self.HiddenServices[Service.Name] = true
         end
     else
@@ -4121,7 +4782,8 @@ function Explorer:CountNilInstancesLite()
 
         Total += 1
 
-        local GoodDesc, Descendants = pcall(NilInstance.GetDescendants, NilInstance)
+        local Descendants = WeakGetDescendants(NilInstance)
+        local GoodDesc = type(Descendants) == "table"
         if GoodDesc and type(Descendants) == "table" then
             Total += #Descendants
         end
@@ -4239,9 +4901,8 @@ function Explorer:CollectNilInstances(SearchFilter, ClassFilter)
         if PassesClass(Instance) and PassesSearch(Instance) then
             table.insert(Result, Instance)
         end
-
-        local GoodChildren, Children = pcall(Instance.GetDescendants, Instance)
-        if not GoodChildren or type(Children) ~= "table" then
+        local Children = WeakGetDescendants(Instance)
+        if type(Children) ~= "table" then
             return
         end
 
@@ -4522,7 +5183,7 @@ function Explorer:MountNilVirtualList()
         return
     end
 
-    for _, Child in Container.ChildContainer:GetChildren() do
+    for _, Child in WeakGetChildren(Container.ChildContainer) do
         Child:Destroy()
     end
 
@@ -4595,8 +5256,9 @@ function Explorer:RebuildExplorer()
         for _, Node in {table.unpack(self.RootNodes)} do
             self:DestroyNode(Node)
         end
+
         self.RootNodes = {}
-        self.NodesByInstance = {}
+        self.NodesByInstance = setmetatable({}, {__mode = "k"})
 
         self.ExplorerColumn:Clear()
 
@@ -4604,7 +5266,7 @@ function Explorer:RebuildExplorer()
             self.HiddenServices = {}
         end
 
-        local Sorted = SortServices(game:GetChildren())
+        local Sorted = SortServices(WeakGetChildren(game))
         local HiddenCount = 0
         for ServiceName in self.HiddenServices do
             HiddenCount += 1
@@ -4734,17 +5396,45 @@ function Explorer:ToggleNilContainerFilter()
 end
 
 function Explorer:BuildMatchSets(Query, Token)
-    local Matches = {}
-    local Subtree = {}
+    local Matches = setmetatable({}, {__mode = "k"})
+    local Subtree = setmetatable({}, {__mode = "k"})
     local Count = 0
     local LowerQuery = Query
     local Filters = self.ActiveClassFilters
     local FilterActive = next(Filters) ~= nil
 
+    local function PropertyFiltersPass(Object)
+        local Filters = self.PropertyFilters
+        if not Filters or next(Filters) == nil then
+            return true
+        end
+
+        for Name, Entry in Filters do
+            local Good, Value = pcall(function()
+                return Object[Name]
+            end)
+
+            if not Good then
+                return false
+            end
+
+            if typeof(Value) ~= Entry.Type then
+                return false
+            end
+
+            if Value ~= Entry.Value then
+                return false
+            end
+        end
+
+        return true
+    end
+
+    local NodesWalked = 0
     local function Walk(Object)
         local HasMatchInside = false
-        local Good, Children = pcall(Object.GetChildren, Object)
-        if Good then
+        local Good, Children = pcall(WeakGetChildren, Object)
+        if Good and type(Children) == "table" then
             for Index = 1, #Children do
                 if Walk(Children[Index]) then
                     HasMatchInside = true
@@ -4764,6 +5454,14 @@ function Explorer:BuildMatchSets(Query, Token)
 
         if HasMatchInside then
             Subtree[Object] = true
+        end
+
+        NodesWalked += 1
+        if NodesWalked % 4000 == 0 then
+            task.wait()
+            if Token ~= self.SearchToken or KillScript then
+                return false
+            end
         end
 
         return HasMatchInside
@@ -4834,9 +5532,7 @@ function Explorer:ApplySearchFilterToNode(Node)
 end
 
 function Explorer:EnsureNodeRealised(Object)
-    if not Object
-        or Object == game
-    then
+    if not Object or Object == game then
         return nil
     end
 
@@ -4845,7 +5541,7 @@ function Explorer:EnsureNodeRealised(Object)
         return Existing
     end
 
-    local Parent = Object.Parent
+    local Parent = ClonerefInstance(Object.Parent)
     if not Parent or Parent == game then
         return nil
     end
@@ -4863,7 +5559,6 @@ function Explorer:EnsureNodeRealised(Object)
 
                 if #ParentNode.PendingChildren == 0 then
                     ParentNode.PendingChildren = nil
-
                     if self.PendingNodesSet then
                         self.PendingNodesSet[ParentNode] = nil
                     end
@@ -4879,23 +5574,72 @@ end
 
 function Explorer:ExpandAncestorsOf(Object)
     local Chain = {}
-    local Cursor = Object.Parent
-    while Cursor and Cursor ~= game do
+    print("[VEX] EAO leaf=", Chain[#Chain],
+    "leafNode=", self.NodesByInstance[Chain[#Chain]],
+    "rootNode=", self.NodesByInstance[Chain[1]],
+    "matchSet=", self.MatchSet[Chain[#Chain]],
+    "subtreeRoot=", self.SubtreeMatchSet[Chain[1]])
+    local Cursor = ClonerefInstance(Object)
+    while Cursor and Cursor.Parent ~= nil do
         table.insert(Chain, 1, Cursor)
-        Cursor = Cursor.Parent
+        Cursor = ClonerefInstance(Cursor.Parent)
     end
 
-    for _, Ancestor in Chain do
+    if #Chain == 0 then
+        return false
+    end
+
+    if self.NodesByInstance[Chain[#Chain]] then
+        return false
+    end
+
+    local PreviousNode
+    local CreatedAny = false
+
+    for Index, Ancestor in Chain do
+        local IsLeaf = Index == #Chain
         local Node = self.NodesByInstance[Ancestor]
-        if not Node then
-            Node = self:EnsureNodeRealised(Ancestor)
+
+        if not Node and PreviousNode then
+            if not PreviousNode.Expanded then
+                self.ForcedExpanded[PreviousNode.Instance] = true
+                self:ExpandNode(PreviousNode)
+            end
+
+            if PreviousNode.PendingChildren then
+                for I, Pending in PreviousNode.PendingChildren do
+                    if Pending == Ancestor then
+                        table.remove(PreviousNode.PendingChildren, I)
+
+                        break
+                    end
+                end
+
+                if #PreviousNode.PendingChildren == 0 then
+                    PreviousNode.PendingChildren = nil
+                    if self.PendingNodesSet then
+                        self.PendingNodesSet[PreviousNode] = nil
+                    end
+                end
+            end
+
+            Node = self:CreateChildNode(PreviousNode, Ancestor)
+            CreatedAny = true
         end
 
-        if Node and not Node.Expanded then
+        if not Node then
+            return CreatedAny
+        end
+
+        if not IsLeaf and not Node.Expanded then
             self.ForcedExpanded[Ancestor] = true
             self:ExpandNode(Node)
         end
+
+        PreviousNode = Node
     end
+
+    return CreatedAny
 end
 
 function Explorer:RefreshAllSearchFilters()
@@ -4904,8 +5648,8 @@ function Explorer:RefreshAllSearchFilters()
     local Token = self.SearchToken
 
     if Query == "" then
-        self.MatchSet = {}
-        self.SubtreeMatchSet = {}
+        self.MatchSet = setmetatable({}, {__mode = "k"})
+        self.SubtreeMatchSet = setmetatable({}, {__mode = "k"})
         for Object in self.ForcedExpanded do
             local Node = self.NodesByInstance[Object]
             if Node and Node.Expanded then
@@ -4933,9 +5677,53 @@ function Explorer:RefreshAllSearchFilters()
     self.MatchSet = Result1
     self.SubtreeMatchSet = Result2
 
-    local Expanded = 0
-    local Cap = 800
+    local OrderedMatches = {}
     for Object in Result1 do
+        table.insert(OrderedMatches, Object)
+    end
+
+    local SortKey = {}
+    for _, Object in OrderedMatches do
+        local Cursor = ClonerefInstance(Object)
+        local Depth = 0
+        local Last = Cursor
+        while Cursor and Cursor.Parent ~= nil do
+            Last = Cursor
+            Cursor = ClonerefInstance(Cursor.Parent)
+            Depth += 1
+        end
+
+        local Name = Last and Last.Name or ""
+        SortKey[Object] = {
+            Rank = PinnedRank[Name] or (#PinnedServices + 1);
+            RootName = Name;
+            Depth = Depth;
+        }
+    end
+
+    table.sort(OrderedMatches, function(Left, Right)
+        local L = SortKey[Left]
+        local R = SortKey[Right]
+        if L.Rank ~= R.Rank then
+            return L.Rank < R.Rank
+        end
+        if L.RootName ~= R.RootName then
+            return L.RootName < R.RootName
+        end
+        return L.Depth < R.Depth
+    end)
+
+    for _, Node in self.NodesByInstance do
+        self:ApplySearchFilterToNode(Node)
+    end
+
+    local Expanded = 0
+    local Cap = 1500
+    local FastBatch = 40 
+    local SinceYield = 0
+    local YieldEvery = 16
+
+    for _, Object in OrderedMatches do
         if Token ~= self.SearchToken then
             return
         end
@@ -4944,13 +5732,19 @@ function Explorer:RefreshAllSearchFilters()
             break
         end
 
-        self:ExpandAncestorsOf(Object)
-        Expanded += 1
-        if Expanded % 30 == 0 then
-            task.wait()
+        if self:ExpandAncestorsOf(Object) then
+            Expanded += 1
 
-            if Token ~= self.SearchToken then
-                return
+            if Expanded > FastBatch then
+                SinceYield += 1
+                if SinceYield >= YieldEvery then
+                    SinceYield = 0
+                    task.wait()
+
+                    if Token ~= self.SearchToken then
+                        return
+                    end
+                end
             end
         end
     end
@@ -5096,7 +5890,7 @@ function Explorer:HandleSearchSubmit()
 
     local function FindFirstMatch(Object)
         local Good, Children = pcall(function()
-            return Object:GetChildren()
+            return WeakGetChildren(Object)
         end)
 
         if not Good then
@@ -5305,7 +6099,7 @@ function Explorer:ClearPropertiesContent()
         return
     end
 
-    for _, Child in self.PropertiesContent:GetChildren() do
+    for _, Child in WeakGetChildren(self.PropertiesContent) do
         if Child:IsA("GuiObject") then
             Child:Destroy()
         end
@@ -5436,7 +6230,7 @@ function Explorer:CreateBooleanRow(Object, PropertyName, Value, Parent)
     local Toggle = VexUI:CreateInstance("TextButton", {
         Size = UDim2.new(0, 56, 0, 18);
         Position = UDim2.new(1, -64, 0.5, -9);
-        BackgroundColor3 = Value and Theme.ToggleOn or Theme.ToggleOff;
+        BackgroundColor3 = Value and Theme.Accent or Theme.ToggleOff;
         BorderSizePixel = 0;
         AutoButtonColor = false;
         Font = Fonts.SemiBold;
@@ -5449,7 +6243,7 @@ function Explorer:CreateBooleanRow(Object, PropertyName, Value, Parent)
     VexUI:AddStroke(Toggle, Theme.Border, 1)
 
     local function ApplyVisual(NewValue)
-        Toggle.BackgroundColor3 = NewValue and Theme.ToggleOn or Theme.ToggleOff
+        Toggle.BackgroundColor3 = NewValue and Theme.Accent or Theme.ToggleOff
         Toggle.Text = NewValue and "true" or "false"
     end
 
@@ -5638,6 +6432,112 @@ function Explorer:GetPropertyCategoryFor(PropertyName, Object)
     return "Other"
 end
 
+function Explorer:RenderAttributesSection(Object, Parent, OrderStart)
+    local Items = CollectAttributes(Object)
+    if #Items == 0 then
+        return OrderStart
+    end
+
+    local Order = OrderStart
+    VexUI:CreateInstance("TextLabel", {
+        Size = UDim2.new(1, 0, 0, 18);
+        BackgroundTransparency = 1;
+        Font = Fonts.Bold;
+        Text = "ATTRIBUTES";
+        TextColor3 = Theme.TextHeader;
+        TextSize = 11;
+        TextXAlignment = Enum.TextXAlignment.Left;
+        LayoutOrder = Order;
+        Parent = Parent;
+    })
+
+    Order += 1
+
+    for _, Entry in Items do
+        local SetValue = function(NewValue)
+            pcall(function()
+                Object:SetAttribute(Entry.Name, NewValue)
+            end)
+        end
+
+        self:CreatePropertyRow(Parent, Order, Entry.Name, Entry.Value, typeof(Entry.Value), SetValue, true)
+        Order += 1
+    end
+
+    return Order
+end
+
+function Explorer:RenderTagsSection(Object, Parent, OrderStart)
+    local Tags = CollectTags(Object)
+    if #Tags == 0 then
+        return OrderStart
+    end
+
+    local Order = OrderStart
+    VexUI:CreateInstance("TextLabel", {
+        Size = UDim2.new(1, 0, 0, 18);
+        BackgroundTransparency = 1;
+        Font = Fonts.Bold;
+        Text = "TAGS";
+        TextColor3 = Theme.TextHeader;
+        TextSize = 11;
+        TextXAlignment = Enum.TextXAlignment.Left;
+        LayoutOrder = Order;
+        Parent = Parent;
+    })
+
+    Order += 1
+
+    for _, Tag in Tags do
+        local Row = VexUI:CreateInstance("Frame", {
+            Size = UDim2.new(1, 0, 0, 22);
+            BackgroundTransparency = 1;
+            LayoutOrder = Order;
+            Parent = Parent;
+        })
+
+        VexUI:CreateInstance("TextLabel", {
+            Size = UDim2.new(1, -52, 1, 0);
+            BackgroundTransparency = 1;
+            Font = Fonts.Mono;
+            Text = tostring(Tag);
+            TextColor3 = Theme.PropString;
+            TextSize = 12;
+            TextXAlignment = Enum.TextXAlignment.Left;
+            Parent = Row;
+        })
+
+        local RemoveButton = VexUI:CreateInstance("TextButton", {
+            Size = UDim2.new(0, 48, 0, 18);
+            Position = UDim2.new(1, -48, 0.5, -9);
+            BackgroundColor3 = Theme.Field;
+            BorderSizePixel = 0;
+            AutoButtonColor = false;
+            Font = Fonts.SemiBold;
+            Text = "Remove";
+            TextColor3 = Theme.Text;
+            TextSize = 10;
+            Parent = Row;
+        })
+        VexUI:AddCorner(RemoveButton, 4)
+        VexUI:AddStroke(RemoveButton, Theme.Border, 1)
+
+        RemoveButton.MouseButton1Click:Connect(function()
+            pcall(function()
+                Services.CollectionService:RemoveTag(Object, Tag)
+            end)
+
+            if self.SelectedInstance == Object then
+                self:RenderProperties(Object)
+            end
+        end)
+
+        Order += 1
+    end
+
+    return Order
+end
+
 function Explorer:RenderProperties(Object)
     Handle(function()
         self:ClearPropertyConnections()
@@ -5658,9 +6558,7 @@ function Explorer:RenderProperties(Object)
         local Buckets = {}
         local BucketOrder = {}
         for _, PropertyName in PropertyNames do
-            if Filter ~= "" and
-                not PropertyName:lower():find(Filter, 1, true)
-            then
+            if Filter ~= "" and not PropertyName:lower():find(Filter, 1, true) then
                 continue
             end
 
@@ -5673,14 +6571,29 @@ function Explorer:RenderProperties(Object)
             table.insert(Buckets[Category], PropertyName)
         end
 
-        for _, Category in BucketOrder do
-            self:CreatePropertyCategoryHeader(self.PropertiesContent, Category)
-
+        local function AddSpacer(Height)
             VexUI:CreateInstance("Frame", {
-                Size = UDim2.new(1, 0, 0, 4);
+                Size = UDim2.new(1, 0, 0, Height);
                 BackgroundTransparency = 1;
                 Parent = self.PropertiesContent;
             })
+        end
+
+        local function AddDivider()
+            local Divider = VexUI:CreateInstance("Frame", {
+                Size = UDim2.new(1, 0, 0, 1);
+                BackgroundColor3 = Theme.BorderSoft;
+                BorderSizePixel = 0;
+                Parent = self.PropertiesContent;
+            })
+            BindTheme("BorderSoft", function(Color)
+                Divider.BackgroundColor3 = Color
+            end)
+        end
+
+        for _, Category in BucketOrder do
+            self:CreatePropertyCategoryHeader(self.PropertiesContent, Category)
+            AddSpacer(4)
 
             local GroupHolder = VexUI:CreateInstance("Frame", {
                 Size = UDim2.new(1, 0, 0, 0);
@@ -5712,6 +6625,7 @@ function Explorer:RenderProperties(Object)
                     local Editable = not IsReadOnly and self:IsEditableValue(Value)
                     self:CreateTextRow(Object, PropertyName, Value, Editable, GroupHolder)
                 end
+
                 local Connected, Connection = pcall(function()
                     if typeof(Object) ~= "Instance" then
                         return nil
@@ -5739,30 +6653,142 @@ function Explorer:RenderProperties(Object)
                 end
             end
 
-            VexUI:CreateInstance("Frame", {
-                Size = UDim2.new(1, 0, 0, 6);
-                BackgroundTransparency = 1;
-                Parent = self.PropertiesContent;
-            })
-
-            local Divider = VexUI:CreateInstance("Frame", {
-                Size = UDim2.new(1, 0, 0, 1);
-                BackgroundColor3 = Theme.BorderSoft;
-                BorderSizePixel = 0;
-                Parent = self.PropertiesContent;
-            })
-            BindTheme("BorderSoft", function(Color)
-                Divider.BackgroundColor3 = Color
-            end)
-
-            VexUI:CreateInstance("Frame", {
-                Size = UDim2.new(1, 0, 0, 4);
-                BackgroundTransparency = 1;
-                Parent = self.PropertiesContent;
-            })
+            AddSpacer(6)
+            AddDivider()
+            AddSpacer(4)
         end
 
-        if #PropertyNames == 0 then
+        local Attributes = CollectAttributes(Object)
+        if Filter ~= "" then
+            local Kept = {}
+            for _, Entry in Attributes do
+                if Entry.Name:lower():find(Filter, 1, true) then
+                    table.insert(Kept, Entry)
+                end
+            end
+            Attributes = Kept
+        end
+
+        if #Attributes > 0 or Filter == "" then
+            self:CreatePropertyCategoryHeader(self.PropertiesContent, "Attributes")
+            AddSpacer(4)
+
+            local AttributeHolder = VexUI:CreateInstance("Frame", {
+                Size = UDim2.new(1, 0, 0, 0);
+                AutomaticSize = Enum.AutomaticSize.Y;
+                BackgroundTransparency = 1;
+                Parent = self.PropertiesContent;
+            })
+            VexUI:AddListLayout(AttributeHolder, 1, Enum.FillDirection.Vertical)
+
+            if #Attributes == 0 then
+                VexUI:CreateInstance("TextLabel", {
+                    Size = UDim2.new(1, 0, 0, 22);
+                    BackgroundTransparency = 1;
+                    Font = Fonts.Medium;
+                    Text = `  (no attributes)`;
+                    TextColor3 = Theme.TextFaded;
+                    TextSize = 12;
+                    TextXAlignment = Enum.TextXAlignment.Left;
+                    Parent = AttributeHolder;
+                })
+            else
+                for _, Entry in Attributes do
+                    local Name = Entry.Name
+                    local Value = Entry.Value
+                    local ValueType = typeof(Value)
+
+                    if ValueType == "boolean" then
+                        self:CreateBooleanRow(Object, `@{Name}`, Value, AttributeHolder)
+                        local RowState = self.PropertyRows[`@{Name}`]
+                        if RowState then
+                            RowState.IsAttribute = true
+                        end
+                    elseif ValueType == "Color3" or ValueType == "BrickColor" then
+                        self:CreateColorRow(Object, `@{Name}`, Value, AttributeHolder)
+                    else
+                        local Editable = self:IsEditableValue(Value)
+                        self:CreateTextRow(Object, `@{Name}`, Value, Editable, AttributeHolder)
+                    end
+
+                    local Row = AttributeHolder:GetChildren()[#AttributeHolder:GetChildren()]
+                    if Row then
+                        for _, Child in Row:GetChildren() do
+                            if Child:IsA("TextLabel") and Child.Text == `@{Name}` then
+                                Child.Text = Name
+                                Child.TextColor3 = Theme.PropEnum
+                            end
+                        end
+                    end
+
+                    local AttrConnGood, AttrConn = pcall(function()
+                        return Object:GetAttributeChangedSignal(Name):Connect(function()
+                            local NewValue = Object:GetAttribute(Name)
+                            local RowState = self.PropertyRows[`@{Name}`]
+                            if RowState and RowState.Update then
+                                pcall(RowState.Update, NewValue)
+                            end
+                        end)
+                    end)
+
+                    if AttrConnGood and AttrConn then
+                        table.insert(self.PropertyConnections, AttrConn)
+                    end
+                end
+            end
+
+            AddSpacer(6)
+            AddDivider()
+            AddSpacer(4)
+        end
+
+        local Tags = CollectTags(Object)
+        self:CreatePropertyCategoryHeader(self.PropertiesContent, "Tags")
+        AddSpacer(4)
+
+        local TagsHolder = VexUI:CreateInstance("Frame", {
+            Size = UDim2.new(1, 0, 0, 0);
+            AutomaticSize = Enum.AutomaticSize.Y;
+            BackgroundTransparency = 1;
+            Parent = self.PropertiesContent;
+        })
+        VexUI:AddListLayout(TagsHolder, 1, Enum.FillDirection.Vertical)
+
+        if #Tags == 0 then
+            VexUI:CreateInstance("TextLabel", {
+                Size = UDim2.new(1, 0, 0, 22);
+                BackgroundTransparency = 1;
+                Font = Fonts.Medium;
+                Text = `  (no tags)`;
+                TextColor3 = Theme.TextFaded;
+                TextSize = 12;
+                TextXAlignment = Enum.TextXAlignment.Left;
+                Parent = TagsHolder;
+            })
+        else
+            for _, Tag in Tags do
+                local TagName = tostring(Tag)
+                local Row = self:CreatePropertyRow(TagsHolder)
+                VexUI:CreateInstance("TextLabel", {
+                    Size = UDim2.new(1, -16, 1, 0);
+                    Position = UDim2.new(0, 8, 0, 0);
+                    BackgroundTransparency = 1;
+                    Font = Fonts.Mono;
+                    Text = TagName;
+                    TextColor3 = Theme.PropString;
+                    TextSize = 12;
+                    TextXAlignment = Enum.TextXAlignment.Left;
+                    TextTruncate = Enum.TextTruncate.AtEnd;
+                    Parent = Row;
+                })
+            end
+        end
+
+        AddSpacer(6)
+        AddDivider()
+        AddSpacer(4)
+
+        if #PropertyNames == 0 and #Attributes == 0 and #Tags == 0 then
             self:AddPropertiesLabel("No registered properties for this class.")
         end
     end, "Function Explorer.RenderProperties")
@@ -5895,10 +6921,6 @@ function Explorer:CreateModalWindow(Title, Width, Height)
     end
 
     CloseButton.MouseButton1Click:Connect(function()
-        self:CloseModal()
-    end)
-
-    Blocker.MouseButton1Click:Connect(function()
         self:CloseModal()
     end)
 
@@ -6295,28 +7317,72 @@ function Explorer:DuplicateSelection()
 end
 
 function Explorer:SelectChildrenOfSelection()
-    local Selection = self:GetSelectionList()
-    if #Selection == 0 then
+    local Sources = {}
+    if self.SelectedOrder and #self.SelectedOrder > 0 then
+        for _, Item in self.SelectedOrder do
+            table.insert(Sources, Item)
+        end
+    elseif self.SelectedInstance then
+        table.insert(Sources, self.SelectedInstance)
+    end
+
+    if #Sources == 0 then
         return
     end
 
-    for _, Object in Selection do
-        local Node = self.NodesByInstance[Object]
-        if Node and not Node.Expanded then
-            self:ExpandNode(Node)
+    local Collected = {}
+    local Seen = {}
+
+    for _, Parent in Sources do
+        if typeof(Parent) ~= "Instance" then
+            continue
+        end
+
+        local ParentNode = self.NodesByInstance[Parent]
+        if ParentNode then
+            if not ParentNode.Expanded then
+                self:ExpandNode(ParentNode)
+            end
+
+            if ParentNode.PendingChildren then
+                for _, Child in {table.unpack(ParentNode.PendingChildren)} do
+                    if Child and not self.NodesByInstance[Child] then
+                        self:CreateChildNode(ParentNode, Child)
+                    end
+                end
+
+                ParentNode.PendingChildren = nil
+                if self.PendingNodesSet then
+                    self.PendingNodesSet[ParentNode] = nil
+                end
+            end
+        end
+
+        local Good, Children = pcall(function()
+            return WeakGetChildren(Parent)
+        end)
+
+        if not Good or type(Children) ~= "table" then
+            continue
+        end
+
+        for _, Child in Children do
+            if not Seen[Child] then
+                Seen[Child] = true
+                table.insert(Collected, Child)
+            end
         end
     end
 
-    local NewSelection = {}
-    for _, Object in Selection do
-        for _, Child in Object:GetChildren() do
-            table.insert(NewSelection, Child)
-        end
+    if #Collected == 0 then
+        return
     end
 
-    if #NewSelection > 0 then
-        self:SetSelection(NewSelection)
+    for _, Child in Collected do
+        self:EnsureNodeVisible(Child)
     end
+
+    self:SetSelection(Collected)
 end
 
 function Explorer:SetAnchorOnSelection(Anchored)
@@ -6329,7 +7395,7 @@ function Explorer:SetAnchorOnSelection(Anchored)
                 Count += 1
             end
 
-            for _, Descendant in Object:GetDescendants() do
+            for _, Descendant in WeakGetDescendants(Object) do
                 if Descendant:IsA("BasePart") then
                     Descendant.Anchored = Anchored
                     Count += 1
@@ -6438,13 +7504,30 @@ function Explorer:OpenInsertObject()
         function(ClassName)
             local Count = 0
             for _, Object in Selection do
+                local NewObject
                 local Good = pcall(function()
-                    local NewObject = Instance.new(ClassName)
+                    NewObject = Instance.new(ClassName)
                     NewObject.Parent = Object
                 end)
 
-                if Good then
+                if Good and NewObject then
                     Count += 1
+
+                    local ParentNode = self.NodesByInstance[Object]
+                    if ParentNode then
+                        self:UpdateArrow(ParentNode)
+
+                        if ParentNode.Expanded
+                            and not self.NodesByInstance[NewObject]
+                        then
+                            if self.SearchQuery == ""
+                                or (self.MatchSet and self.MatchSet[NewObject])
+                                or (self.SubtreeMatchSet and self.SubtreeMatchSet[NewObject])
+                            then
+                                self:CreateChildNode(ParentNode, NewObject)
+                            end
+                        end
+                    end
                 end
             end
 
@@ -7289,11 +8372,13 @@ function Explorer:OpenScriptViewer(ScriptObject, UseDefault)
         Size = UDim2.new(1, 0, 1, 0);
         BackgroundTransparency = 1;
         BorderSizePixel = 0;
-        ScrollBarThickness = 4;
+        ScrollBarThickness = 6;
         ScrollBarImageColor3 = Theme.Border;
         CanvasSize = UDim2.new(0, 0, 0, 0);
         AutomaticCanvasSize = Enum.AutomaticSize.XY;
         ScrollingDirection = Enum.ScrollingDirection.XY;
+        HorizontalScrollBarInset = Enum.ScrollBarInset.ScrollBar;
+        VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar;
         ZIndex = 51;
         Parent = Body;
     })
@@ -7308,7 +8393,7 @@ function Explorer:OpenScriptViewer(ScriptObject, UseDefault)
     local GutterWidth = 8 + LineDigits * 7 + 8
 
     local GutterHolder = VexUI:CreateInstance("Frame", {
-        Size = UDim2.new(0, GutterWidth, 0, 0);
+        Size = UDim2.fromOffset(GutterWidth, 0);
         AutomaticSize = Enum.AutomaticSize.Y;
         BackgroundColor3 = Theme.TitleBar;
         BackgroundTransparency = 0.5;
@@ -7323,15 +8408,16 @@ function Explorer:OpenScriptViewer(ScriptObject, UseDefault)
     VexUI:AddPadding(GutterHolder, 6, 8, 6, 0)
 
     local CodeHolder = VexUI:CreateInstance("Frame", {
-        Size = UDim2.new(0, 0, 0, 0);
+        Size = UDim2.fromOffset(0, 0);
         AutomaticSize = Enum.AutomaticSize.XY;
-        Position = UDim2.new(0, GutterWidth + 6, 0, 0);
+        Position = UDim2.fromOffset(GutterWidth + 6, 0);
         BackgroundTransparency = 1;
         ZIndex = 52;
         Parent = Scroll;
     })
     VexUI:CreateInstance("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder;
+        HorizontalAlignment = Enum.HorizontalAlignment.Left;
         Parent = CodeHolder;
     })
     VexUI:AddPadding(CodeHolder, 6, 8, 6, 4)
@@ -7344,8 +8430,8 @@ function Explorer:OpenScriptViewer(ScriptObject, UseDefault)
         ChunkOrder += 1
 
         return VexUI:CreateInstance("TextLabel", {
-            Size = UDim2.new(1, 0, 0, 0);
-            AutomaticSize = Enum.AutomaticSize.Y;
+            Size = UDim2.fromOffset(0, 0);
+            AutomaticSize = Enum.AutomaticSize.XY;
             BackgroundTransparency = 1;
             Font = Fonts.Code;
             Text = Text;
@@ -7467,6 +8553,89 @@ function Explorer:OpenScriptViewer(ScriptObject, UseDefault)
             Dragging = false
         end
     end))
+
+    local MinW, MinH = 360, 220
+    local EdgeThickness = 6
+
+    local function MakeEdge(Position, Size, DirX, DirY)
+        local Edge = VexUI:CreateInstance("Frame", {
+            Position = Position;
+            Size = Size;
+            BackgroundTransparency = 1;
+            ZIndex = 60;
+            Active = true;
+            Parent = Window;
+        })
+
+        local Resizing = false
+        local StartInput, StartSize, StartPosition
+
+        Edge.InputBegan:Connect(function(Input)
+            if Input.UserInputType == Enum.UserInputType.MouseButton1
+                or Input.UserInputType == Enum.UserInputType.Touch
+            then
+                Resizing = true
+                StartInput = Input.Position
+                StartSize = Window.AbsoluteSize
+                StartPosition = Window.Position
+                BringToFront()
+            end
+        end)
+
+        Track(Services.UserInputService.InputChanged:Connect(function(Input)
+            if not Resizing or not Window.Parent then
+                return
+            end
+
+            if Input.UserInputType ~= Enum.UserInputType.MouseMovement
+                and Input.UserInputType ~= Enum.UserInputType.Touch
+            then
+                return
+            end
+
+            local Delta = Input.Position - StartInput
+            local NewW = StartSize.X
+            local NewH = StartSize.Y
+            local NewX = StartPosition.X.Offset
+            local NewY = StartPosition.Y.Offset
+
+            if DirX == 1 then
+                NewW = math.max(MinW, StartSize.X + Delta.X)
+            elseif DirX == -1 then
+                local Width = math.max(MinW, StartSize.X - Delta.X)
+                NewX = StartPosition.X.Offset + (StartSize.X - Width)
+                NewW = Width
+            end
+
+            if DirY == 1 then
+                NewH = math.max(MinH, StartSize.Y + Delta.Y)
+            elseif DirY == -1 then
+                local Height = math.max(MinH, StartSize.Y - Delta.Y)
+                NewY = StartPosition.Y.Offset + (StartSize.Y - Height)
+                NewH = Height
+            end
+
+            Window.Size = UDim2.fromOffset(NewW, NewH)
+            Window.Position = UDim2.new(StartPosition.X.Scale, NewX, StartPosition.Y.Scale, NewY)
+        end))
+
+        Track(Services.UserInputService.InputEnded:Connect(function(Input)
+            if Input.UserInputType == Enum.UserInputType.MouseButton1
+                or Input.UserInputType == Enum.UserInputType.Touch
+            then
+                Resizing = false
+            end
+        end))
+    end
+
+    MakeEdge(UDim2.new(1, -EdgeThickness, 0, EdgeThickness), UDim2.new(0, EdgeThickness, 1, -EdgeThickness * 2), 1, 0)
+    MakeEdge(UDim2.new(0, 0, 0, EdgeThickness), UDim2.new(0, EdgeThickness, 1, -EdgeThickness * 2), -1, 0)
+    MakeEdge(UDim2.new(0, EdgeThickness, 1, -EdgeThickness), UDim2.new(1, -EdgeThickness * 2, 0, EdgeThickness), 0, 1)
+    MakeEdge(UDim2.new(0, EdgeThickness, 0, 0), UDim2.new(1, -EdgeThickness * 2, 0, EdgeThickness), 0, -1)
+    MakeEdge(UDim2.new(1, -EdgeThickness, 1, -EdgeThickness), UDim2.fromOffset(EdgeThickness, EdgeThickness), 1, 1)
+    MakeEdge(UDim2.new(0, 0, 1, -EdgeThickness), UDim2.fromOffset(EdgeThickness, EdgeThickness), -1, 1)
+    MakeEdge(UDim2.new(1, -EdgeThickness, 0, 0), UDim2.fromOffset(EdgeThickness, EdgeThickness), 1, -1)
+    MakeEdge(UDim2.new(0, 0, 0, 0), UDim2.fromOffset(EdgeThickness, EdgeThickness), -1, -1)
 end
 
 function Explorer:OpenSettings()
@@ -7528,7 +8697,7 @@ function Explorer:OpenSettings()
         local Switch = VexUI:CreateInstance("TextButton", {
             Size = UDim2.new(0, 32, 0, 16);
             Position = UDim2.new(1, -32, 0.5, -8);
-            BackgroundColor3 = InitialState and Theme.ToggleOn or Theme.ToggleOff;
+            BackgroundColor3 = InitialState and Theme.Accent or Theme.ToggleOff;
             BorderSizePixel = 0;
             AutoButtonColor = false;
             Text = "";
@@ -7551,7 +8720,7 @@ function Explorer:OpenSettings()
         local State = InitialState
         Switch.MouseButton1Click:Connect(function()
             State = not State
-            VexUI:Tween(Switch, {BackgroundColor3 = State and Theme.ToggleOn or Theme.ToggleOff})
+            VexUI:Tween(Switch, {BackgroundColor3 = State and Theme.Accent or Theme.ToggleOff})
             VexUI:Tween(Knob, {Position = State and UDim2.new(1, -14, 0.5, -6) or UDim2.new(0, 2, 0.5, -6)})
             OnChange(State)
         end)
@@ -7829,6 +8998,25 @@ function Explorer:OpenSettings()
     CreateColorRow("Default", "PropDefault", 26)
 end
 
+function Explorer:FormatFilterValue(Value)
+    local Kind = typeof(Value)
+    if Kind == "string" then
+        return `"{Value}"`
+    elseif Kind == "EnumItem" then
+        return tostring(Value)
+    elseif Kind == "Instance" then
+        return `<{Value.ClassName}> {Value.Name}`
+    elseif Kind == "Color3" then
+        return `Color3({math.floor(Value.R * 255)}, {math.floor(Value.G * 255)}, {math.floor(Value.B * 255)})`
+    elseif Kind == "Vector3" or Kind == "Vector2" or Kind == "UDim2" or Kind == "UDim" or Kind == "CFrame" then
+        return tostring(Value)
+    elseif Kind == "boolean" or Kind == "number" then
+        return tostring(Value)
+    end
+
+    return `<{Kind}>`
+end
+
 function Explorer:OpenFiltersDropdown(AnchorButton)
     if self.FiltersDropdown then
         self.FiltersDropdown:Destroy()
@@ -7895,7 +9083,7 @@ function Explorer:OpenFiltersDropdown(AnchorButton)
     local Dropdown = Window.Frame
     Dropdown.ZIndex = 151
 
-    for _, Descendant in Dropdown:GetDescendants() do
+    for _, Descendant in WeakGetDescendants(Dropdown) do
         if Descendant:IsA("GuiObject") then
             Descendant.ZIndex = Descendant.ZIndex + 150
         end
@@ -8145,7 +9333,7 @@ function Explorer:OpenFiltersDropdown(AnchorButton)
         )
 
         local ServiceList = {}
-        for _, Service in game:GetChildren() do
+        for _, Service in WeakGetChildren(game) do
             table.insert(ServiceList, {Name = Service.Name; ClassName = Service.ClassName})
         end
 
@@ -8195,7 +9383,6 @@ function Explorer:OpenFiltersDropdown(AnchorButton)
         end
     end)
 
-    Blocker.MouseButton1Click:Connect(Close)
     self.FiltersDropdown = Dropdown
     self.FiltersBlocker = Blocker
 end
@@ -8698,15 +9885,19 @@ function Explorer:BuildPropertiesWindow()
 end
 
 function Explorer:CloseContextMenu()
-    if self.ContextMenuFrame then
-        self.ContextMenuFrame:Destroy()
-        self.ContextMenuFrame = nil
+    self._ContextMenuToken = nil
+
+    if self.ContextMenuBlocker and self.ContextMenuBlocker.Parent then
+        self.ContextMenuBlocker:Destroy()
     end
 
-    if self.ContextMenuBlocker then
-        self.ContextMenuBlocker:Destroy()
-        self.ContextMenuBlocker = nil
+    self.ContextMenuBlocker = nil
+
+    if self.ContextMenuFrame and self.ContextMenuFrame.Parent then
+        self.ContextMenuFrame:Destroy()
     end
+
+    self.ContextMenuFrame = nil
 end
 
 function Explorer:OpenContextMenu(AnchorX, AnchorY)
@@ -8719,26 +9910,32 @@ function Explorer:OpenContextMenu(AnchorX, AnchorY)
 
     local PrimaryClass = self.SelectedInstance and self.SelectedInstance.ClassName or ""
 
-    local Blocker = VexUI:CreateInstance("TextButton", {
-        Size = UDim2.fromScale(1, 1);
-        BackgroundTransparency = 1;
-        AutoButtonColor = false;
-        Text = "";
-        Modal = true;
-        ZIndex = 200;
-        Parent = self.ScreenGui;
-    })
-    self.ContextMenuBlocker = Blocker
+    local CloseToken = {}
+    self._ContextMenuToken = CloseToken
 
-    Blocker.MouseButton1Click:Connect(function()
-        self:CloseContextMenu()
-    end)
+    local Menu
+    local InputConnection
 
-    Blocker.MouseButton2Click:Connect(function()
-        self:CloseContextMenu()
-    end)
+    local function Close()
+        if self._ContextMenuToken ~= CloseToken then
+            return
+        end
 
-    local Menu = VexUI:CreateInstance("Frame", {
+        self._ContextMenuToken = nil
+
+        if InputConnection then
+            InputConnection:Disconnect()
+            InputConnection = nil
+        end
+
+        if Menu and Menu.Parent then
+            Menu:Destroy()
+        end
+
+        self.ContextMenuFrame = nil
+    end
+
+    Menu = VexUI:CreateInstance("Frame", {
         Size = UDim2.fromOffset(220, 0);
         AutomaticSize = Enum.AutomaticSize.Y;
         Position = UDim2.fromOffset(AnchorX, AnchorY);
@@ -8756,6 +9953,36 @@ function Explorer:OpenContextMenu(AnchorX, AnchorY)
     end)
 
     self.ContextMenuFrame = Menu
+
+    InputConnection = Services.UserInputService.InputBegan:Connect(function(Input)
+        if Input.UserInputType ~= Enum.UserInputType.MouseButton1
+            and Input.UserInputType ~= Enum.UserInputType.MouseButton2
+            and Input.UserInputType ~= Enum.UserInputType.Touch
+        then
+            return
+        end
+
+        if not Menu or not Menu.Parent then
+            Close()
+
+            return
+        end
+
+        local MouseX = Input.Position.X
+        local MouseY = Input.Position.Y
+        local AbsPos = Menu.AbsolutePosition
+        local AbsSize = Menu.AbsoluteSize
+
+        if MouseX >= AbsPos.X
+            and MouseX <= AbsPos.X + AbsSize.X
+            and MouseY >= AbsPos.Y
+            and MouseY <= AbsPos.Y + AbsSize.Y
+        then
+            return
+        end
+
+        Close()
+    end)
 
     local function MakeItem(LabelText, Disabled, Callback)
         local Item = VexUI:CreateInstance("TextButton", {
@@ -8790,7 +10017,7 @@ function Explorer:OpenContextMenu(AnchorX, AnchorY)
         end))
 
         Track(Item.MouseButton1Click:Connect(function()
-            self:CloseContextMenu()
+            Close()
             Callback()
         end))
 
@@ -8839,6 +10066,23 @@ function Explorer:OpenContextMenu(AnchorX, AnchorY)
     MakeItem("Clear Search & Jump", false, function()
         self:ClearSearchAndJumpTo()
     end)
+
+    local Target = self.SelectedInstance
+    local IsPlayer = false
+    if Target then
+        local Good, Result = pcall(function()
+            return Target:IsA("Player")
+        end)
+
+        IsPlayer = Good and Result
+    end
+
+    if IsPlayer then
+        MakeItem("Jump to Character", false, function()
+            self:JumpToCharacter(Target)
+            self:CloseContextMenu()
+        end)
+    end
 
     MakeSeparator()
 
@@ -9242,6 +10486,12 @@ function Explorer:InitConfig()
             self:ApplyConfigData(Data)
         end
 
+        self.HideNilContainer = true
+
+        for _, Name in RiskyServices do
+            self.HiddenServices[Name] = true
+        end
+
         self.ConfigLoaded = true
         self:SaveConfig()
     end, "InitConfig")
@@ -9295,9 +10545,9 @@ function Explorer:Kill()
         end
     end)
 
-    self.NodesByInstance = {}
+    self.NodesByInstance = setmetatable({}, {__mode = "k"})
     self.RootNodes = {}
-    self.SelectedSet = {}
+    self.SelectedSet = setmetatable({}, {__mode = "k"})
     self.SelectedOrder = {}
     self.SelectedInstance = nil
 end
@@ -9316,6 +10566,12 @@ function Explorer:Create()
     Handle(function()
         self:InitConfig()
         self.ScreenGui = VexUI:CreateScreenGui()
+
+        self.NodesByInstance = setmetatable({}, {__mode = "k"})
+        self.MatchSet = setmetatable({}, {__mode = "k"})
+        self.SubtreeMatchSet = setmetatable({}, {__mode = "k"})
+        self.ForcedExpanded = setmetatable({}, {__mode = "k"})
+        self.SelectedSet = setmetatable({}, {__mode = "k"})
 
         self:BuildExplorerWindow()
         self:BuildPropertiesWindow()
